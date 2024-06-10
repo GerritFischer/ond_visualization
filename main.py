@@ -2,8 +2,8 @@ import time
 import numpy as np
 from vedo import Plotter
 from vedo.pyplot import plot
-from vedo import Text2D
-from vedo import Ellipsoid, show
+from vedo import Text2D, Latex
+from vedo import Ellipsoid, show, colors
 import random
 from brainrender import Scene
 from brainrender.actors import Points
@@ -13,6 +13,7 @@ from brainbox.singlecell import calculate_peths
 from one.api import ONE
 from ibllib.atlas import AllenAtlas
 import math
+import colorsys
 one = ONE(base_url='https://openalyx.internationalbrainlab.org', password='international', silent=True)
 ba = AllenAtlas()
 
@@ -75,12 +76,16 @@ end = spikes.times[-1]
 timer = 0
 i = 0
 
+def hsv2rgb(h,s,v):
+    return tuple(round(i * 255) for i in colorsys.hsv_to_rgb(h,s,v))
+
 def animation_tick(event): 
     global regionModels
     global timer
     global end
     global i
     global text
+    plotter.get_actors()[1].GetProperty().SetColor(1,1,1)
     if(timer < end):
         currentSpikes = []
         elemStillIn = True
@@ -92,20 +97,31 @@ def animation_tick(event):
             else:
                 elemStillIn = False
             i += 1
-
-        outputString = "Total Spikes: " + str(len(currentSpikes)) + "\n"
+        text_array[19].text("Total Spikes: " + str(len(currentSpikes)))
+        #outputString = "Total Spikes: " + str(len(currentSpikes)) + "\n"
         #print(spikes.clusters.keys())
         for k in range(len(regionModels)):
             spikesInRegion = 0
             for j in currentSpikes:
                 if(clusters.acronym[spikes.clusters[j]] == regionModels[k][0]):
                     spikesInRegion += 1
-            outputString += "Spikes in " + regionModels[k][0] + ": " + str(spikesInRegion) + "\n"
+            #outputString += "Spikes in " + regionModels[k][0] + ": " + str(spikesInRegion) + "\n"
             plotter.get_actors()[k+2].GetProperty().SetOpacity(spikesInRegion * 0.001)
+            color = hsv2rgb(k / len(regionModels), 1,1)
+            color255 = (color[0]/255, color[1]/255, color[2]/255)
+            
+            
+            text_array[18-k].text("Spikes in " + regionModels[k][0] + ": " + str(spikesInRegion))
+            text_array[18-k].properties.SetColor(color255)
+            plotter.get_actors()[k+2].GetProperty().SetColor(color)
+            plotter.get_actors()[k+2].GetProperty().SetRepresentation(1)
+            plotter.get_actors()[k]
+            
             print(spikesInRegion)
             #regionModels[i][1].SetAlpha(spikesInRegion * 0.01)
-        outputString += "Time: " + str(timer)
-        text.text(outputString)
+        #outputString += "Time: " + str(timer)
+        text_array[18-len(regionModels)].text("Time: " + str(timer))
+        #text.text(outputString)
         timer += 1 
     global time_e  
     print(plotter.get_actors())
@@ -126,7 +142,15 @@ plotter= Plotter()
 
 button = plotter.add_button(button_play_pause, states=[" Play ","Pause"], size=40)
 evntid = plotter.add_callback("timer", animation_tick, enable_picking=False)
-text = Text2D("Test")
-plotter.add(text)
+#text = Text2D("Test")
+#text.color("white")
+#plotter.add(text)
 plotter.roll(180)
+plotter.background("grey0")
+text_array = []
+for l in range(20):
+    text_t = Text2D(" ")
+    text_t.pos((0.005,l*0.03+0.4295))
+    text_array.append(text_t)
+    plotter.add(text_t)
 plotter.show( __doc__, scene.get_actors())
