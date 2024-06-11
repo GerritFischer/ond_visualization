@@ -131,6 +131,12 @@ def animation_tick(event):
     plotter.render()
 
 
+#Notes
+#shorten time frame
+#move time frame slowly
+#try to divide brain region into smaller parts as "neurons"
+#indicate current event (stimOn, response etc)
+#fix linux problems (maybe), color problems, divByZero prob
 
 
 time_e = 0
