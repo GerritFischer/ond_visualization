@@ -2,8 +2,7 @@ import time
 import numpy as np
 from vedo import Plotter
 from vedo.pyplot import plot
-import matplotlib.pyplot as plt
-from vedo import Text2D, Latex, Image
+from vedo import Text2D, Latex, Picture, Sphere, Image
 from vedo import Ellipsoid, show, colors
 import random
 from brainrender import Scene
@@ -14,6 +13,7 @@ from brainbox.singlecell import calculate_peths
 from one.api import ONE
 from ibllib.atlas import AllenAtlas
 import math
+import matplotlib.pyplot as plt
 import colorsys
 import vtk
 one = ONE(base_url='https://openalyx.internationalbrainlab.org', password='international', silent=True)
@@ -106,17 +106,23 @@ def skip(obj,btn):
     global goCue
     global trialCounter
     global feedbackTimeIndex
+
+    global prevAction
+    global prevGoCueIndex
+    global prevFeedIndex
     #timer=math.floor(goCue[goCueIndex+skipCounter-1]*10)/10
     if (goCueIndex+skipCounter<len(goCue)):
         if(goCueIndex+skipCounter>=0):
             goCueIndex+=skipCounter
             goCueIndex-=1
             trialCounter+=skipCounter
-            print(trialCounter!=0)
-            print(trialCounter)
             trialCounter-=1
-            if(trialCounter!=0):
+            if(feedbackTimeIndex!=0 and goCueIndex!=1):
                 feedbackTimeIndex=goCueIndex-1
+            if(goCueIndex!=0):
+                print("yo")
+                prevGoCueIndex=goCueIndex-1
+                prevFeedIndex=goCueIndex-1
             timer=math.floor(goCue[goCueIndex]*10)/10
         else:
             goCueIndex=0
@@ -177,10 +183,24 @@ def updateTrialInfo():
     global stimCounter
     global stimAppear
 
+    global prevAction
+    global prevGoCueIndex
+    global prevFeedIndex
+
+    if(prevFeedIndex<=len(feedbackTime)):
+        if (timer-0.4>=feedbackTime[prevFeedIndex]):
+            prevAction="Feedback Time"
+            prevFeedIndex+=1
+    if(prevFeedIndex<=len(goCue)):
+        if (timer-0.4>=goCue[prevGoCueIndex]):
+            prevAction="Go Cue"
+            prevGoCueIndex+=1
+
     if(feedbackTimeIndex<=len(feedbackTime)):
         if (timer+0.1>=feedbackTime[feedbackTimeIndex]):
                 currentAction="Feedback Time"
-                #feedbackTimeIndex+=1
+                print(feedbackTimeIndex)
+                feedbackTimeIndex+=1
     if(goCueIndex<=len(goCue)):
         if (timer+0.1>=goCue[goCueIndex]):
             currentAction="Go Cue"
@@ -209,6 +229,72 @@ def updateTrialInfo():
     stimText.text(stimAppear)
 
 
+def generateTimeline():
+    fig = plt.figure()
+    fig.add_subplot(111)
+
+    N, bins, patches = plt.hist(x=[1,40,100],bins=100, range=(1,100))
+    fig.tight_layout(pad=1)
+    fig.canvas.draw()
+
+    data = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
+    data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+
+
+    pic = Image(data)
+    pic.resize([400,300])
+
+
+    mapper = vtk.vtkImageMapper()
+    mapper.SetInputData(pic.dataset)
+    mapper.SetColorWindow(255)
+    mapper.SetColorLevel(127.5)
+    actor2d = vtk.vtkActor2D()
+    actor2d.SetMapper(mapper)
+    actor2d.GetPositionCoordinate().SetCoordinateSystemToNormalizedViewport()
+    actor2d.SetPosition(0.2, 0.1)
+    actor2d.GetProperty().SetDisplayLocationToBackground()
+    actor2d.SetDisplayPosition(0, 400)
+    return actor2d, []
+def updateTimeline(actor2d, dataSet):
+    global timer
+    fig= plt.figure()
+    ax = fig.add_subplot(111)
+    fig.set_facecolor("black")
+    ax.set_facecolor("black")
+
+    number = random.randint(1,100)
+    dataSet = [x + 1 for x in dataSet if x <= 100]
+
+    print(dataSet)
+    global prevAction
+    if(prevAction == "Go Cue"):
+        dataSet.append(1)
+    N, bins, patches = plt.hist(dataSet, bins=100, range=(1,100))
+    #patches[number-1].set_facecolor((random.random(), random.random(), random.random()))
+    fig.tight_layout(pad=1)
+    fig.canvas.draw()
+
+    data = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
+    data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+
+
+    pic = Image(data)
+    pic.resize([400,300])
+
+
+    mapper = vtk.vtkImageMapper()
+    mapper.SetInputData(pic.dataset)
+    mapper.SetColorWindow(255)
+    mapper.SetColorLevel(127.5)
+    actor2d.SetMapper(mapper)
+    actor2d.GetPositionCoordinate().SetCoordinateSystemToNormalizedViewport()
+    actor2d.SetPosition(0.2, 0.1)
+    actor2d.GetProperty().SetDisplayLocationToBackground()
+    actor2d.SetDisplayPosition(0, 400)
+    return actor2d, dataSet
+
+
 
 scene = Scene(atlas_name="allen_mouse_25um", title="")
 spikes, clusters, channels = loadData()
@@ -223,6 +309,9 @@ end = spikes.times[-1]
 timer = 0
 i = 0
 
+prevFeedIndex=0
+prevGoCueIndex=0
+prevAction=""
 goCue , feedbackTime, feedbackType, stim=loadTrials()
 trialCounter=0
 currentAction=""
@@ -231,8 +320,8 @@ goCueIndex=0
 feedbackTimeIndex=0
 stimCounter=0
 stimAppear="Stim Off"
-
 skipCounter=1
+
 
 def slowdecSkip(obj,btn):
     global skipCounter
@@ -312,78 +401,15 @@ def animation_tick(event):
 
     plotter.render()
 
-def generateTimeline():
-    fig = plt.figure()
-    fig.add_subplot(111)
 
-    N, bins, patches = plt.hist(x=[1,40,100],bins=100, range=(1,100))
-    fig.tight_layout(pad=1)
-    fig.canvas.draw()
-
-    data = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
-    data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
-
-
-    pic = Image(data)
-    pic.resize([400,300])
-
-
-    mapper = vtk.vtkImageMapper()
-    mapper.SetInputData(pic.dataset)
-    mapper.SetColorWindow(255)
-    mapper.SetColorLevel(127.5)
-    actor2d = vtk.vtkActor2D()
-    actor2d.SetMapper(mapper)
-    actor2d.GetPositionCoordinate().SetCoordinateSystemToNormalizedViewport()
-    actor2d.SetPosition(0.2, 0.1)
-    actor2d.GetProperty().SetDisplayLocationToBackground()
-    actor2d.SetDisplayPosition(0, 400)
-    return actor2d, []
-def updateTimeline(actor2d, dataSet):
-    global timer
-    fig= plt.figure()
-    ax = fig.add_subplot(111)
-    fig.set_facecolor("black")
-    ax.set_facecolor("black")
-
-    number = random.randint(1,100)
-    dataSet = [x + 1 for x in dataSet if x <= 100]
-
-    print(dataSet)
-    global currentAction
-    if(currentAction == "Go Cue"):
-        dataSet.append(50)
-    N, bins, patches = plt.hist(dataSet, bins=100, range=(1,100))
-    #patches[number-1].set_facecolor((random.random(), random.random(), random.random()))
-    fig.tight_layout(pad=1)
-    fig.canvas.draw()
-
-    data = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
-    data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
-
-
-    pic = Image(data)
-    pic.resize([400,300])
-
-
-    mapper = vtk.vtkImageMapper()
-    mapper.SetInputData(pic.dataset)
-    mapper.SetColorWindow(255)
-    mapper.SetColorLevel(127.5)
-    actor2d.SetMapper(mapper)
-    actor2d.GetPositionCoordinate().SetCoordinateSystemToNormalizedViewport()
-    actor2d.SetPosition(0.2, 0.1)
-    actor2d.GetProperty().SetDisplayLocationToBackground()
-    actor2d.SetDisplayPosition(0, 400)
-    return actor2d, dataSet
 #Notes
 #shorten time frame
 #move time frame slowly
 #try to divide brain region into smaller parts as "neurons"
 #indicate current event (stimOn, response etc)
 #fix linux problems (maybe), color problems, divByZero prob
-print(stim)
 
+print(stim)
 time_e = 0
 timer_id = -1
 #t0 = time.time()
@@ -394,16 +420,15 @@ currentActionText=Text2D(" ",pos=(0.7,0.97),c=(1,1,1))
 trialCounterText=Text2D(" ",pos=(0.7,1),c=(1,1,1))
 rewardTypeText=Text2D(" ",pos=(0.7,0.94),c=(1,1,1))
 stimText = Text2D(" ",pos=(0.7,0.91),c=(1,1,1))
-
 skipCounterText= Text2D(str(skipCounter),pos=(0.2,0.1),c=(1,1,1),s=2.5)
-
 plotter.add(currentActionText)
 plotter.add(trialCounterText)
 plotter.add(rewardTypeText)
 plotter.add(stimText)
 plotter.add(skipCounterText)
 
-button = plotter.add_button(button_play_pause, states=[" Play ","Pause"], size=40,pos=(0.9,0.1))
+
+button = plotter.add_button(button_play_pause, states=[" Play ","Pause"], size=40)
 evntid = plotter.add_callback("timer", animation_tick, enable_picking=False)
 
 skipBtn=plotter.add_button(skip,states=["Skip"],size=40,pos=(0.5,0.1))
@@ -414,6 +439,7 @@ inSBtn= plotter.add_button(slowinSkip,states=["+"],size=20,pos=(0.27,0.09))
 inFBtn=plotter.add_button(fastinSkip,states=["++"],size=20,pos=(0.33,0.09))
 
 
+
 plotter.roll(180)
 plotter.background("grey0")
 text_array = []
@@ -422,8 +448,14 @@ for l in range(20):
     text_t.pos((0.005,l*0.03+0.4295))
     text_array.append(text_t)
     plotter.add(text_t)
+
+#---------------------------
+
 textCurrentPointer = Text2D("↓ - Go Cues")
 textCurrentPointer.pos((0.105, 0.71))
 plotter.add(textCurrentPointer)
 actor2d, dataSet = generateTimeline()
+
 plotter.show( __doc__, scene.get_actors(), actor2d)
+
+
