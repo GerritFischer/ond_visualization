@@ -1,6 +1,7 @@
 from vedo import Plotter
 from vedo import Text2D,Button
 import math
+from timeline import *
 class actors:
     skipCounter=0
     prevFeedIndex=0
@@ -32,6 +33,7 @@ class actors:
         self.feedbackTime=feedbackTime
         self.feedbackType=feedbackType
         self.stim=stim
+        self.timeline = timeline(0.105, 0.71)
         self.addActors()
         self.createRightText()
 
@@ -45,6 +47,7 @@ class actors:
         self.plotter.add_button(self.fastdecSkip,states=["--"],size=20,pos=(0.09,0.09))
         self.plotter.add_button(self.slowinSkip,states=["+"],size=20,pos=(0.27,0.09))
         self.plotter.add_button(self.fastinSkip,states=["++"],size=20,pos=(0.33,0.09))
+        self.timeline.addToPlotter(self.plotter)
 
     def button_play_pause(self,obj, btn):
         self.plotter.timer_callback("destroy", self.timer_id)

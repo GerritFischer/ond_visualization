@@ -15,6 +15,7 @@ from ibllib.atlas import AllenAtlas
 import math
 from function import *
 from actors import *
+from timeline import *
 
 class brain:
     timer_id=-1
@@ -46,6 +47,10 @@ class brain:
 
         self.plotter, self.text_array= createText(self.plotter)
         self.regionModels=getRegionModel(self.clusters,self.scene)
+
+    
+        
+
 
         
 
@@ -79,6 +84,7 @@ class brain:
             self.i=self.actors.getSpikeIndex()
         self.plotter.get_actors()[1].GetProperty().SetColor(1,1,1)
         if(self.timer < self.end):
+            self.actors.timeline.updateHistogram(self.timer, self.actors.prevAction)
             currentSpikes = []
             elemStillIn = True
             while(elemStillIn):
