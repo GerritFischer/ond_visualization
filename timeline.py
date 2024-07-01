@@ -95,3 +95,5 @@ class timeline:
     def addToPlotter(self, plotter):
         for actor in self.actors:
             plotter.add(actor)
+    def updateWholeDataSet(self, dataset):
+        self.data_names = dataset
