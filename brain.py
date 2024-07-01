@@ -96,7 +96,7 @@ class brain:
                 if(self.i >= len(self.spikes.times)):
                     print("BREAAAK") 
                     break
-                if(self.spikes.times[self.i] > self.timer and self.spikes.times[self.i] < self.timer + 0.01):
+                if(self.spikes.times[self.i] > self.timer and self.spikes.times[self.i] < self.timer + 0.1):
                     currentSpikes.append(self.i)
             
                 else:
@@ -134,9 +134,8 @@ class brain:
             self.text_array[18-len(self.regionModels)].text("Time: " + str(self.timer))
             #text.text(outputString)
             print(self.timer)
-            self.timer = math.floor((self.timer*100)+1)/100
-        self.time_e += 0.01
-
+            self.timer = math.floor((self.timer*10)+1)/10
+        self.time_e += 0.1
         self.plotter.render()
 
     
