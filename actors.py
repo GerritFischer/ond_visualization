@@ -53,7 +53,7 @@ class actors:
         self.plotter.timer_callback("destroy", self.timer_id)
         if "Play" in self.button.status():
             # instruct to call handle_timer() every 10 msec:
-            self.timer_id = self.plotter.timer_callback("create", dt=1000)
+            self.timer_id = self.plotter.timer_callback("create", dt=10)
         self.button.switch() 
     
     def slowdecSkip(self,obj,btn):
@@ -135,12 +135,37 @@ class actors:
     def getTimer(self):
         return self.timer
     #füge Skip function hinzu
+    def getTimelineData(self):
+        appendItem=False
+        timelineTimer= self.timer-0.5
+        timelineArr=[]
+        timelineGoCueIn=self.prevGoCueIndex
+        timelineFeedback=self.prevFeedIndex
+        for i in range(0,100):
+            if math.floor((timelineTimer+0.01)*100)/100>=self.feedbackTime[timelineFeedback]and timelineTimer<=self.feedbackTime[timelineFeedback]:
+                if self.feedbackType[timelineFeedback]>0:
+                    timelineArr.append("Reward")
+                    timelineFeedback+=1
+                    appendItem=True
+                else:
+                    timelineArr.append("False")
+                    timelineFeedback+=1
+                    appendItem=True
+            if math.floor((timelineTimer+0.01)*100)/100>=self.goCue[timelineGoCueIn] and timelineTimer<= self.goCue[timelineGoCueIn]:
+                timelineArr.append("Go Cue")
+                appendItem=True
 
+            if not appendItem:
+                timelineArr.append(" ")
+            appendItem=False
+            timelineTimer= math.floor((timelineTimer+0.01)*100)/100
+        return timelineArr
 
     def skip(self,obj,btn):
         if self.skipCounter==0:
             return
         self.skipped=True
+        self.timeline.updateWholeDataSet(self.getTimelineData())
         if (self.goCueIndex+self.skipCounter<len(self.goCue)):
             if(self.goCueIndex+self.skipCounter>=0):
                 print("yeep")
@@ -199,9 +224,9 @@ class actors:
                     self.stimAppear="Stim Off"
         self.currentAction="Go Cue"
         if self.feedbackType[self.trialCounter]>0:
-            rewardType="Reward"
+            self.rewardType="Reward"
         else:
-            rewardType="Error"
+            self.rewardType="Error"
         if self.timer!=0 and self.prevFeedIndex!=0 and self.prevGoCueIndex!=0:
             if self.feedbackTime[self.prevFeedIndex]>self.goCue[self.prevGoCueIndex]:
                 self.prevAction="Feedback Time"
