@@ -2,7 +2,7 @@ import time
 import numpy as np
 from vedo import Plotter
 from vedo.pyplot import plot
-from vedo import Text2D, Latex
+from vedo import Text2D, Latex, Mesh
 from vedo import Ellipsoid, show, colors
 import random
 from brainrender import Scene
@@ -24,6 +24,7 @@ class brain:
     timer=0
     i=0
     start=0
+    brain_actors = []
     def __init__(self) :
         self.roi="SI"
         self.one = ONE(base_url='https://openalyx.internationalbrainlab.org', password='international', silent=True)
@@ -47,6 +48,7 @@ class brain:
 
         self.plotter, self.text_array= createText(self.plotter)
         self.regionModels=getRegionModel(self.clusters,self.scene)
+        self.brain_actors = self.scene.get_actors()
 
     
         
@@ -55,7 +57,7 @@ class brain:
         
 
     def startRender(self):
-        self.plotter.show( __doc__, self.scene.get_actors())
+        self.plotter.show( __doc__, self.brain_actors)
 
     def loadData(self):
         print(f'Found {len(self.ses)} recordings')
@@ -82,7 +84,7 @@ class brain:
             self.actors.setSkipped()
             self.timer=self.actors.getTimer()
             self.i=self.actors.getSpikeIndex()
-        self.plotter.get_actors()[1].GetProperty().SetColor(1,1,1)
+        self.brain_actors[0].actor.GetProperty().SetColor(1,1,1)
         if(self.timer < self.end):
             self.actors.timeline.updateHistogram(self.timer, self.actors.prevAction)
             currentSpikes = []
@@ -106,16 +108,18 @@ class brain:
                     if(self.clusters.acronym[self.spikes.clusters[j]] == self.regionModels[k][0]):
                         spikesInRegion += 1
             #outputString += "Spikes in " + regionModels[k][0] + ": " + str(spikesInRegion) + "\n"
-                self.plotter.get_actors()[k+7].GetProperty().SetOpacity(spikesInRegion * 0.001)#überarbeite mit len (actors)
+                self.brain_actors[k+1].actor.GetProperty().SetOpacity(spikesInRegion * 0.01)#überarbeite mit len (actors)
+                o = Mesh()
+                
+
                 color = hsv2rgb(k / len(self.regionModels), 1,1)
                 color255 = (color[0]/255, color[1]/255, color[2]/255)
             
             
                 self.text_array[18-k].text("Spikes in " + self.regionModels[k][0] + ": " + str(spikesInRegion))
                 self.text_array[18-k].properties.SetColor(color255)
-                self.plotter.get_actors()[k+7].GetProperty().SetColor(color)#überarbeite mit len (actors)
-                self.plotter.get_actors()[k+7].GetProperty().SetRepresentation(1)#überarbeite mit len (actors)
-                self.plotter.get_actors()[k]
+                self.brain_actors[k+1].actor.GetProperty().SetColor(color255)#überarbeite mit len (actors)
+                self.brain_actors[k+1].actor.GetProperty().SetRepresentation(1)#überarbeite mit len (actors)
             
             #regionModels[i][1].SetAlpha(spikesInRegion * 0.01)
             #outputString += "Time: " + str(timer)
