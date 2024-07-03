@@ -57,7 +57,7 @@ class brain:
         
 
     def startRender(self):
-        self.plotter.show( __doc__, self.brain_actors)
+        self.plotter.show( __doc__, self.brain_actors).close()
 
     def loadData(self):
         print(f'Found {len(self.ses)} recordings')

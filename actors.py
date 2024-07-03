@@ -26,6 +26,7 @@ class actors:
     timer=0
     plotter= Plotter()
     newTimes=0
+    speed_minus = 2000
 
     def __init__(self,spikes,goCue,feedbackTime,feedbackType,stim):
         self.spikes=spikes
@@ -47,13 +48,14 @@ class actors:
         self.plotter.add_button(self.fastdecSkip,states=["--"],size=20,pos=(0.09,0.09))
         self.plotter.add_button(self.slowinSkip,states=["+"],size=20,pos=(0.27,0.09))
         self.plotter.add_button(self.fastinSkip,states=["++"],size=20,pos=(0.33,0.09))
+        self.plotter.add_slider(self.speedslider, xmin=0, xmax=2999, value=2000, pos="bottom-right", title="Speed", show_value=True)
         self.timeline.addToPlotter(self.plotter)
 
     def button_play_pause(self,obj, btn):
         self.plotter.timer_callback("destroy", self.timer_id)
         if "Play" in self.button.status():
             # instruct to call handle_timer() every 10 msec:
-            self.timer_id = self.plotter.timer_callback("create", dt=1000)
+            self.timer_id = self.plotter.timer_callback("create", dt=math.ceil(3000-self.speed_minus))
         self.button.switch() 
     
     def slowdecSkip(self,obj,btn):
@@ -64,6 +66,13 @@ class actors:
         self.skipCounter+=10
     def slowinSkip(self,obj,btn):
         self.skipCounter+=1
+    def speedslider(self, widget, event):
+        self.speed_minus = widget.value
+        if "Pause" in self.button.status():
+            self.plotter.timer_callback("destroy", self.timer_id)
+            self.timer_id = self.plotter.timer_callback("create", dt=math.ceil(3000-self.speed_minus))
+
+
 
     def updateTrialInfo(self,timer):
         self.timer=timer
