@@ -125,11 +125,10 @@ class brain:
                 self.text_array[18-k].properties.SetColor(color255)
                 self.brain_actors[k+1].actor.GetProperty().SetColor(color255)#überarbeite mit len (actors)
                 self.brain_actors[k+1].actor.GetProperty().SetRepresentation(1)#überarbeite mit len (actors)
-            print("REACHED")
             #regionModels[i][1].SetAlpha(spikesInRegion * 0.01)
             #outputString += "Time: " + str(timer)
             self.actors.updateTrialInfo(self.timer)
-            print("REACHED2")
+
 
             self.text_array[18-len(self.regionModels)].text("Time: " + str(self.timer))
             #text.text(outputString)

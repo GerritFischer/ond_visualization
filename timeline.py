@@ -7,7 +7,7 @@ class timeline:
     def __init__(self,x, y):
         self.x = x
         self.y = y
-        self.generateOverlay("↓ - Go Cues")
+        #self.generateOverlay("↓ - Go Cues")
         self.generateHistogram()
         self.data_names = []
         self.dataset = []
@@ -71,7 +71,7 @@ class timeline:
             self.data_names[98-i+1] = self.data_names[98-i] 
         
         print(self.data_names)
-
+        patches[50].set_edgecolor((1,1,1))
         fig.tight_layout(pad=1)
         fig.canvas.draw()
 
