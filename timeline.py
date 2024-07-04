@@ -3,9 +3,10 @@ import matplotlib.pyplot as plt
 import vtk
 import numpy as np
 import math
-class timeline:
-    actors = []
+from actortemplate import *
+class Timeline(ActorTemplate):
     def __init__(self,x, y):
+        super().__init__()
         self.x = x
         self.y = y
         #self.generateOverlay("↓ - Go Cues")
@@ -20,7 +21,7 @@ class timeline:
     def generateOverlay(self, headingString):
         heading = Text2D(headingString)
         heading.pos((self.x+0.1, self.y+0.1))
-        self.actors.append(heading)
+        super().addActor(heading)
     def generateHistogram(self):
         fig = plt.figure()
         fig.add_subplot(111)
@@ -48,7 +49,7 @@ class timeline:
         actor2d.GetProperty().SetDisplayLocationToBackground()
         #actor2d.SetDisplayPosition(0,400)
         self.hist = actor2d      
-        self.actors.append(self.hist)
+        super().addActor(self.hist)
     def updateHistogram(self, timer, prevAction, plotter):
         fig= plt.figure()
         ax = fig.add_subplot(111)
@@ -93,8 +94,5 @@ class timeline:
         self.hist.SetPosition(self.x, self.y)
         self.hist.GetProperty().SetDisplayLocationToBackground()
         #self.hist.SetDisplayPosition(0, 400)
-    def addToPlotter(self, plotter):
-        for actor in self.actors:
-            plotter.add(actor)
     def updateWholeDataSet(self, dataset):
         self.data_names = dataset

@@ -1,6 +1,6 @@
-from brain import *
+from renderer import Renderer
 
-b = brain()
-b.startRender()
+r = Renderer()
+r.startRender()
 
 
