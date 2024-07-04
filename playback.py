@@ -1,5 +1,6 @@
-from actortemplate import *
-from vedo import Button, Slider2D, Text2D
+from actortemplate import ActorTemplate
+from vedo import Button, Text2D
+from custom_classes import CustomSlider
 import math
 import colorsys
 
@@ -31,6 +32,9 @@ class Playback(ActorTemplate):
     timer=0
     newTimes=0
     speed_minus = 2000
+    
+
+
 
     def __init__(self, button_play_pause):
         self.button_play_pause = button_play_pause
@@ -45,7 +49,8 @@ class Playback(ActorTemplate):
         super().addActor(Button(self.fastdecSkip,states=["--"],size=20,pos=(0.25,0.1)))
         super().addActor(Button(self.slowinSkip,states=["+"],size=20,pos=(0.45,0.1)))
         super().addActor(Button(self.fastinSkip,states=["++"],size=20,pos=(0.5,0.1)))
-        #super().addActor(Slider2D(self.speedslider, xmin=0, xmax=2999, value=2000, pos=[(0.8,0.05),(0.98, 0.05)], title="", show_value=True, c=(1,1,1)))
+        super().addActor(CustomSlider(self.speedslider, xmin=0, xmax=2999, value=2000, pos=[(0.8,0.05),(0.98, 0.05)], title="", show_value=True, c=(1,1,1)))
+        print(self.actors)
         #self.timeslider = Slider2D(self.timerslider, xmin=0, xmax=5000, value=0, pos=[(0.8,0.15),(0.98, 0.15)], show_value=True, c=(1,1,1))                                                           #xmax=self.spikes.times[-1]
         #super().addActor(self.timeslider)
 

@@ -16,11 +16,12 @@ class Renderer:
         self.background = Background()
         self.playback = Playback(self.button_play_pause)
         self.info = Info()
-        self.info.addToPlotter(self.plotter)
-        self.playback.addToPlotter(self.plotter)
+
+        self.background.addToPlotter(self.plotter)
+        self.info.addToPlotter(self.plotter)  
         self.timeline.addToPlotter(self.plotter)
         self.brain.addToPlotter(self.plotter)
-        self.background.addToPlotter(self.plotter)
+        self.playback.addToPlotter(self.plotter)
 
         self.plotter.roll(180)
         self.plotter.background((30,30,30))
@@ -28,6 +29,7 @@ class Renderer:
 
         self.plotter.add_callback("timer", self.animation_tick, enable_picking=False)
     def startRender(self):
+        print(self.plotter.get_actors())
         self.plotter.show(__doc__)
 
     def hsv2rgb(self, h,s,v):
