@@ -1,5 +1,5 @@
 from vedo import Plotter
-from vedo import Text2D,Button
+from vedo import Text2D,Button, LegendBox, Sphere
 import math
 from timeline import *
 class actors:
@@ -34,30 +34,62 @@ class actors:
         self.feedbackTime=feedbackTime
         self.feedbackType=feedbackType
         self.stim=stim
-        self.timeline = timeline(0.105, 0.71)
+        self.timeline = timeline(0, 0.3)
         self.addActors()
         self.createRightText()
 
     def addActors(self):
-        self.button = self.plotter.add_button(self.button_play_pause, states=[" Play ","Pause"], size=40,pos=(0.9,0.1))
+        #background
+        self.generateBackground()
+        #playpause
+        self.button = self.plotter.add_button(self.button_play_pause, states=[" ▶ "," ⏸ "], size=20,pos=(0.2,0.1), font="Kanopus")
         #self.plotter.add_callback("timer", self.animation_tick, enable_picking=False)
 
-        self.plotter.add_button(self.skip,states=["Skip"],size=40,pos=(0.5,0.1))
+        self.plotter.add_button(self.skip,states=["Skip"],size=40,pos=(0.7,0.1))
 
-        self.plotter.add_button(self.slowdecSkip,states=["-"],size=20,pos=(0.15,0.09))
-        self.plotter.add_button(self.fastdecSkip,states=["--"],size=20,pos=(0.09,0.09))
-        self.plotter.add_button(self.slowinSkip,states=["+"],size=20,pos=(0.27,0.09))
-        self.plotter.add_button(self.fastinSkip,states=["++"],size=20,pos=(0.33,0.09))
-        self.plotter.add_slider(self.speedslider, xmin=0, xmax=2999, value=2000, pos="bottom-right", title="Speed", show_value=True)
+        self.plotter.add_button(self.slowdecSkip,states=["-"],size=20,pos=(0.3,0.1))
+        self.plotter.add_button(self.fastdecSkip,states=["--"],size=20,pos=(0.25,0.1))
+        self.plotter.add_button(self.slowinSkip,states=["+"],size=20,pos=(0.45,0.1))
+        self.plotter.add_button(self.fastinSkip,states=["++"],size=20,pos=(0.5,0.1))
+        self.plotter.add_slider(self.speedslider, xmin=0, xmax=2999, value=2000, pos=[(0.8,0.05),(0.98, 0.05)], title="", show_value=True, c=(1,1,1))
+        self.timeslider = self.plotter.add_slider(self.timerslider, xmin=0, xmax=self.spikes.times[-1], value=0, pos=[(0.8,0.15),(0.98, 0.15)], show_value=True, c=(1,1,1))
         self.timeline.addToPlotter(self.plotter)
 
     def button_play_pause(self,obj, btn):
         self.plotter.timer_callback("destroy", self.timer_id)
-        if "Play" in self.button.status():
+        if "▶" in self.button.status():
             # instruct to call handle_timer() every 10 msec:
             self.timer_id = self.plotter.timer_callback("create", dt=math.ceil(3000-self.speed_minus))
         self.button.switch() 
-    
+    def generateBackground(self):
+        print("generated background")
+        #generate actor with empty legend as placeholder
+        placeholderSphere = Sphere()
+        placeholderSphere.legend(" ")
+        #top side bar 
+        lboxSidebarTop = LegendBox([placeholderSphere], width=0.15, height=0.6, c=(0,0,0), pos="top-left", alpha=1, padding=0)
+        lboxSidebarTop.SetBackgroundColor(0.14,0.14,0.14)
+        lboxSidebarTop.SetEntryColor(0, 0.14,0.14,0.14)
+        lboxSidebarTop.BorderOff()
+        self.plotter.add(lboxSidebarTop)
+        #bottom side bar
+        lboxSidebarBottom = LegendBox([placeholderSphere], width=0.15, height=0.3, c=(0,0,0), pos="bottom-left", alpha=1, padding=0)
+        lboxSidebarBottom.SetBackgroundColor(0.14,0.14,0.14)
+        lboxSidebarBottom.SetEntryColor(0,0.14,0.14,0.14)
+        lboxSidebarBottom.BorderOff()
+        self.plotter.add(lboxSidebarBottom)
+        lboxBottomBar = LegendBox([placeholderSphere], width=0.85, height=0.15, c=(0,0,0), pos="bottom-left", alpha=1, padding=0)
+        lboxBottomBar.SetBackgroundColor(0.14,0.14,0.14)
+        lboxBottomBar.SetEntryColor(0, 0.14,0.14,0.14)
+        lboxBottomBar.BorderOff()
+        lboxBottomBar.GetPositionCoordinate().SetValue(0.15, 0)
+
+        self.plotter.add(lboxBottomBar)
+        
+
+    def timerslider(self, widget, event):
+        self.timer = widget.value
+
     def slowdecSkip(self,obj,btn):
         self.skipCounter-=1
     def fastdecSkip(self,obj,btn):
@@ -68,7 +100,7 @@ class actors:
         self.skipCounter+=1
     def speedslider(self, widget, event):
         self.speed_minus = widget.value
-        if "Pause" in self.button.status():
+        if "⏸" in self.button.status():
             self.plotter.timer_callback("destroy", self.timer_id)
             self.timer_id = self.plotter.timer_callback("create", dt=math.ceil(3000-self.speed_minus))
 
@@ -106,7 +138,6 @@ class actors:
                     self.stimAppear="Stim On"
                 else:
                     self.stimAppear="Stim Off"
-                print("yeayyy")
                 self.stimCounter+=1
 
         self.currentActionText.text("Order: "+self.currentAction)
@@ -121,14 +152,13 @@ class actors:
         for i in self.plotter.get_actors():
             if type(i)==Button:
                 counter+=1
-        print(counter)
         return len(self.plotter.get_actors())
     def createRightText(self):
         self.currentActionText=Text2D(" ",pos=(0.7,0.97),c=(1,1,1))
         self.trialCounterText=Text2D(" ",pos=(0.7,1),c=(1,1,1))
         self.rewardTypeText=Text2D(" ",pos=(0.7,0.94),c=(1,1,1))
         self.stimText = Text2D(" ",pos=(0.7,0.91),c=(1,1,1))
-        self.skipCounterText= Text2D(str(self.skipCounter),pos=(0.2,0.1),c=(1,1,1),s=2.5)
+        self.skipCounterText= Text2D(str(self.skipCounter),pos=(0.35,0.1),c=(1,1,1),s=2.5)
 
         self.plotter.add(self.currentActionText)
         self.plotter.add(self.trialCounterText)
@@ -152,7 +182,6 @@ class actors:
         self.skipped=True
         if (self.goCueIndex+self.skipCounter<len(self.goCue)):
             if(self.goCueIndex+self.skipCounter>=0):
-                print("yeep")
                 self.goCueIndex+=self.skipCounter
                 self.goCueIndex-=1
                 self.trialCounter+=self.skipCounter

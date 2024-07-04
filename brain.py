@@ -44,11 +44,12 @@ class brain:
         self.plotter.add_callback("timer", self.animation_tick, enable_picking=False)
 
         self.plotter.roll(180)
-        self.plotter.background("grey0")
+        self.plotter.background((30,30,30))
 
         self.plotter, self.text_array= createText(self.plotter)
         self.regionModels=getRegionModel(self.clusters,self.scene)
         self.brain_actors = self.scene.get_actors()
+        
 
     
         
@@ -60,6 +61,7 @@ class brain:
         self.plotter.show( __doc__, self.brain_actors).close()
 
     def loadData(self):
+        
         print(f'Found {len(self.ses)} recordings')
         #isolating first session and probe ID
         PID = self.ses[0]['id']
@@ -79,22 +81,19 @@ class brain:
         return goCue, feedbackTime, feedbackType, stim
     
     def animation_tick(self,event):
-        print("TICK TACK")
         if self.actors.isSkipped():
-            print("hey")
             self.actors.setSkipped()
             self.timer=self.actors.getTimer()
             self.i=self.actors.getSpikeIndex()
         self.brain_actors[0].actor.GetProperty().SetColor(1,1,1)
         if(self.timer < self.end):
-            
-            self.actors.timeline.updateHistogram(self.timer, self.actors.prevAction)
+            self.actors.timeslider.value = self.timer  
+            self.actors.timeline.updateHistogram(self.timer, self.actors.prevAction, self.plotter)
             currentSpikes = []
             elemStillIn = True
             
             while(elemStillIn):
                 if(self.i >= len(self.spikes.times)):
-                    print("BREAAAK") 
                     break
                 if(self.spikes.times[self.i] > self.timer and self.spikes.times[self.i] < self.timer + 0.1):
                     currentSpikes.append(self.i)

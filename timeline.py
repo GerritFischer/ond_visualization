@@ -2,6 +2,7 @@ from vedo import Text2D, Image
 import matplotlib.pyplot as plt
 import vtk
 import numpy as np
+import math
 class timeline:
     actors = []
     def __init__(self,x, y):
@@ -45,10 +46,10 @@ class timeline:
         actor2d.GetPositionCoordinate().SetCoordinateSystemToNormalizedViewport()
         actor2d.SetPosition(self.x, self.y)
         actor2d.GetProperty().SetDisplayLocationToBackground()
-        actor2d.SetDisplayPosition(0,400)
+        #actor2d.SetDisplayPosition(0,400)
         self.hist = actor2d      
         self.actors.append(self.hist)
-    def updateHistogram(self, timer, prevAction):
+    def updateHistogram(self, timer, prevAction, plotter):
         fig= plt.figure()
         ax = fig.add_subplot(111)
         fig.set_facecolor("black")
@@ -70,7 +71,6 @@ class timeline:
         for i in range(0,99):
             self.data_names[98-i+1] = self.data_names[98-i] 
         
-        print(self.data_names)
         patches[50].set_edgecolor((1,1,1))
         fig.tight_layout(pad=1)
         fig.canvas.draw()
@@ -78,9 +78,10 @@ class timeline:
         data = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
         data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
 
-
+        
         pic = Image(data)
-        pic.resize([400,300])
+        pic.resize([math.floor(plotter.window.GetActualSize()[0] * 0.15), math.floor(plotter.window.GetActualSize()[1] * 0.1)])
+        pic.actor.SetPosition(0.3,0.3,0)
 
 
         mapper = vtk.vtkImageMapper()
@@ -91,7 +92,7 @@ class timeline:
         self.hist.GetPositionCoordinate().SetCoordinateSystemToNormalizedViewport()
         self.hist.SetPosition(self.x, self.y)
         self.hist.GetProperty().SetDisplayLocationToBackground()
-        self.hist.SetDisplayPosition(0, 400)
+        #self.hist.SetDisplayPosition(0, 400)
     def addToPlotter(self, plotter):
         for actor in self.actors:
             plotter.add(actor)
