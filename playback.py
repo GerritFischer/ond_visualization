@@ -36,8 +36,9 @@ class Playback(ActorTemplate):
 
 
 
-    def __init__(self, button_play_pause):
+    def __init__(self, button_play_pause, speedslider):
         self.button_play_pause = button_play_pause
+        self.speedslider = speedslider
         super().__init__()
         self.button = Button(self.button_play_pause, states=[" ▶ "," ⏸ "], size=20,pos=(0.2,0.1), font="Kanopus")
         print(type(self.button))
@@ -68,11 +69,7 @@ class Playback(ActorTemplate):
         self.skipCounter+=10
     def slowinSkip(self,obj,btn):
         self.skipCounter+=1
-    def speedslider(self, widget, event):
-        self.speed_minus = widget.value
-        if "⏸" in self.button.status():
-            self.plotter.timer_callback("destroy", self.timer_id)
-            self.timer_id = self.plotter.timer_callback("create", dt=math.ceil(3000-self.speed_minus))
+
 
     def skip(self,obj,btn):
         if self.skipCounter==0:

@@ -10,7 +10,7 @@ class ActorTemplate:
         self.actors.append(actor)
     def addToPlotter(self, plotter):
         for actor in self.actors:
-            if(type(actor) == type(Button())):
+            if(type(actor) == Button):
                 plotter.add_button(actor.function, font="Kanopus", states=actor.states, size=20, pos=(actor.GetPositionCoordinate().GetValue()[0],actor.GetPositionCoordinate().GetValue()[1]))
             elif(type(actor) == CustomSlider):
                 #test = Slider2D()

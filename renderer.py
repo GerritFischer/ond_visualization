@@ -14,7 +14,7 @@ class Renderer:
         self.brain = BrainNew()
         self.timeline = Timeline(0, 0.3)
         self.background = Background()
-        self.playback = Playback(self.button_play_pause)
+        self.playback = Playback(self.button_play_pause, self.speedslider)
         self.info = Info()
 
         self.background.addToPlotter(self.plotter)
@@ -42,6 +42,7 @@ class Renderer:
             self.i=self.playback.getSpikeIndex()
         if(self.playback.timer < self.end):
             #self.actors.timeslider.value = self.timer  
+            print(self.playback.speed_minus)
             self.timeline.updateHistogram(self.playback.timer, self.playback.prevAction, self.plotter)
 
             currentSpikes = []
@@ -89,4 +90,17 @@ class Renderer:
         if "▶" in btn.status():
             self.timer_id = self.plotter.timer_callback("create", dt=math.ceil(3000-self.playback.speed_minus))
         btn.switch()
+    def speedslider(self, widget, event):
+        self.playback.speed_minus = widget.value
+        
+        #TODO: needs fixing
+        try:
+            print("ARGHT")
+            self.plotter.timer_callback("destroy", self.timer_id)
+            self.timer_id = self.plotter.timer_callback("create", dt=math.ceil(3000-self.playback.speed_minus))
+        except:
+            pass
+
+        #if "⏸" in self.playback.button.status():
+
     
