@@ -41,18 +41,11 @@ class Playback(ActorTemplate):
         self.timerslider = timerslider
 
         super().__init__()
-        self.timeslider = CustomSlider(self.timerslider, xmin=0, xmax=4000, value=2000, pos=[(0.25,0.08),(0.5, 0.08)], show_value=True, c=(1,1,1))                                                           #xmax=self.spikes.times[-1]
-        super().addActor(self.timeslider)
-        self.button = CustomButton(self.button_play_pause, states=[" ▶ "," ⏸ "], size=50, c=("white","white"), bc=("grey1","grey1"),pos=(0.2,0.11), font="Kanopus")
+        super().addActor(CustomSlider(self.timerslider, xmin=0, xmax=4000, value=2000, pos=[(0.25,0.09),(0.5, 0.09)], show_value=True, c=(1,1,1)))
+        super().addActor(CustomSlider(self.skip, xmin=0, xmax=1, value=0, pos=[(0.25,0.03),(0.5, 0.03)], show_value=True, c=(1,1,1)))
+        self.button = CustomButton(self.button_play_pause, states=[" ▶ "," ⏸ "], size=50, c=("white","white"), bc=("grey1","grey1"),pos=(0.21,0.09), font="Kanopus")
         print(type(self.button))
         super().addActor(self.button)
-
-        super().addActor(CustomButton(self.skip,states=["Skip"],size=40,pos=(0.7,0.1)))
-
-        super().addActor(CustomButton(self.slowdecSkip,states=["-"],size=20,pos=(0.5,0.1)))
-        super().addActor(CustomButton(self.fastdecSkip,states=["--"],size=20,pos=(0.55,0.1)))
-        super().addActor(CustomButton(self.slowinSkip,states=["+"],size=20,pos=(0.65,0.1)))
-        super().addActor(CustomButton(self.fastinSkip,states=["++"],size=20,pos=(0.7,0.1)))
         super().addActor(CustomSlider(self.speedslider, xmin=0, xmax=2999, value=2000, pos=[(0.8,0.05),(0.98, 0.05)], title="", show_value=True, c=(1,1,1)))
         print(self.actors)
 
@@ -60,17 +53,6 @@ class Playback(ActorTemplate):
     def hsv2rgb(h,s,v):
         return tuple(round(i * 255) for i in colorsys.hsv_to_rgb(h,s,v))
 
-    
-
-
-    def slowdecSkip(self,obj,btn):
-        self.skipCounter-=1
-    def fastdecSkip(self,obj,btn):
-        self.skipCounter-=10
-    def fastinSkip(self,obj,btn):
-        self.skipCounter+=10
-    def slowinSkip(self,obj,btn):
-        self.skipCounter+=1
 
  
 

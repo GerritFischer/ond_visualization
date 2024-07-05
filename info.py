@@ -23,7 +23,7 @@ class Info(ActorTemplate):
     def createText(self):
         for l in range(20):
             text_t = Text2D(" ")
-            text_t.pos((0.005,l*0.03-0.3))
+            text_t.pos((0.005,l*0.03-0.315))
             text_t.properties.SetColor(1,1,1)
             super().addActor(text_t)
     def setSessionInfo(self, sessionInfo=["unknown-EID", "unknown-PID", "unknow-animal", "unknown-lab"]):
@@ -32,14 +32,14 @@ class Info(ActorTemplate):
         self.createSessionInfo()
     def createSessionInfo(self):
         print("run")
-        self.headingSessionID = Text2D("Session-ID:", pos=(0.005, 0.98), c=(1,1,1))
-        self.sessionID = Text2D(self.sessionInfo[0], pos=(0.005, 0.95), c=(1,1,1))
-        self.headingProbeID = Text2D("Probe-ID:", pos=(0.005, 0.92), c=(1,1,1))
-        self.probeID = Text2D(self.sessionInfo[1], pos=(0.005, 0.89), c=(1,1,1))
-        self.headingAnimal = Text2D("Animal:", pos=(0.005, 0.86), c=(1,1,1))
-        self.animal = Text2D(self.sessionInfo[2], pos=(0.005, 0.83), c=(1,1,1))
-        self.headingLab = Text2D("Lab:", pos=(0.005, 0.8), c=(1,1,1))
-        self.lab = Text2D(self.sessionInfo[3], pos=(0.005, 0.77), c=(1,1,1))
+        self.headingSessionID = Text2D("Session-ID:", pos=(0.005, 0.96), c=(1,1,1))
+        self.sessionID = Text2D(self.sessionInfo[0], pos=(0.005, 0.93), c=(1,1,1))
+        self.headingProbeID = Text2D("Probe-ID:", pos=(0.005, 0.90), c=(1,1,1))
+        self.probeID = Text2D(self.sessionInfo[1], pos=(0.005, 0.87), c=(1,1,1))
+        self.headingAnimal = Text2D("Animal:", pos=(0.005, 0.84), c=(1,1,1))
+        self.animal = Text2D(self.sessionInfo[2], pos=(0.005, 0.81), c=(1,1,1))
+        self.headingLab = Text2D("Lab:", pos=(0.005, 0.78), c=(1,1,1))
+        self.lab = Text2D(self.sessionInfo[3], pos=(0.005, 0.75), c=(1,1,1))
         super().addActor(self.headingSessionID)
         super().addActor(self.sessionID)
         super().addActor(self.headingProbeID)

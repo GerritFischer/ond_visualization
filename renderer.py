@@ -14,6 +14,13 @@ class Renderer:
         self.timeline = Timeline(0, 0.3)
         self.background = Background()
         self.playback = Playback(self.button_play_pause, self.speedslider, self.timerslider)
+        self.end = self.brain.spikes.times[-1] #temp
+        rep = self.playback.actors[0].GetSliderRepresentation()
+        print(rep.GetMaximumValue())
+        rep.SetMaximumValue(math.floor(self.end))
+        
+        self.playback.actors[0].SetRepresentation(rep)
+
         self.info = Info()
         self.info.setSessionInfo()
         self.background.addToPlotter(self.plotter)
@@ -26,13 +33,9 @@ class Renderer:
         self.plotter.roll(180)
         self.plotter.background((30,30,30))
         
-        self.end = self.brain.spikes.times[-1] #temp
-        #wip
-        rep = self.playback.actors[0].GetSliderRepresentation()
-        print(rep.GetMaximumValue())
-        rep.SetMaximumValue(math.floor(self.end))
         
-        self.playback.actors[0].SetRepresentation(rep)
+        #wip
+
 
         self.plotter.add_callback("timer", self.animation_tick, enable_picking=False)
     def startRender(self):
@@ -102,6 +105,9 @@ class Renderer:
     def speedslider(self, widget, event):
         self.playback.speed_minus = widget.value
         self.updateSpikeIndex()
+
+        
+
         
         #TODO: needs fixing
         try:
@@ -114,6 +120,7 @@ class Renderer:
     def timerslider(self, widget, event):
         self.playback.timer = math.floor(widget.value*100) / 100
         self.updateSpikeIndex()
+
         
 
         #if "⏸" in self.playback.button.status():
