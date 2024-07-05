@@ -16,12 +16,13 @@ class Renderer:
         self.background = Background()
         self.playback = Playback(self.button_play_pause, self.speedslider)
         self.info = Info()
-
+        self.info.setSessionInfo()
         self.background.addToPlotter(self.plotter)
         self.info.addToPlotter(self.plotter)  
         self.timeline.addToPlotter(self.plotter)
         self.brain.addToPlotter(self.plotter)
         self.playback.addToPlotter(self.plotter)
+        
 
         self.plotter.roll(180)
         self.plotter.background((30,30,30))
@@ -44,7 +45,6 @@ class Renderer:
             #self.actors.timeslider.value = self.timer  
             print(self.playback.speed_minus)
             self.timeline.updateHistogram(self.playback.timer, self.playback.prevAction, self.plotter)
-
             currentSpikes = []
             elemStillIn = True         
             while(elemStillIn):

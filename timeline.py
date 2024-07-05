@@ -49,6 +49,7 @@ class Timeline(ActorTemplate):
         actor2d.GetProperty().SetDisplayLocationToBackground()
         #actor2d.SetDisplayPosition(0,400)
         self.hist = actor2d      
+        self.hist.SetVisibility(0)
         super().addActor(self.hist)
     def updateHistogram(self, timer, prevAction, plotter):
         fig= plt.figure()
@@ -93,6 +94,7 @@ class Timeline(ActorTemplate):
         self.hist.GetPositionCoordinate().SetCoordinateSystemToNormalizedViewport()
         self.hist.SetPosition(self.x, self.y)
         self.hist.GetProperty().SetDisplayLocationToBackground()
+        self.hist.SetVisibility(1)
         #self.hist.SetDisplayPosition(0, 400)
     def updateWholeDataSet(self, dataset):
         self.data_names = dataset

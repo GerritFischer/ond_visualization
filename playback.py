@@ -1,6 +1,6 @@
 from actortemplate import ActorTemplate
 from vedo import Button, Text2D
-from custom_classes import CustomSlider
+from custom_classes import CustomSlider, CustomButton
 import math
 import colorsys
 
@@ -34,33 +34,38 @@ class Playback(ActorTemplate):
     speed_minus = 2000
     
 
-
-
     def __init__(self, button_play_pause, speedslider):
         self.button_play_pause = button_play_pause
         self.speedslider = speedslider
         super().__init__()
-        self.button = Button(self.button_play_pause, states=[" ▶ "," ⏸ "], size=20,pos=(0.2,0.1), font="Kanopus")
+        self.button = CustomButton(self.button_play_pause, states=[" ▶ "," ⏸ "], size=50, c=("white","white"), bc=("grey1","grey1"),pos=(0.2,0.1), font="Kanopus")
         print(type(self.button))
         super().addActor(self.button)
 
-        super().addActor(Button(self.skip,states=["Skip"],size=40,pos=(0.7,0.1)))
+        super().addActor(CustomButton(self.skip,states=["Skip"],size=40,pos=(0.7,0.1)))
 
-        super().addActor(Button(self.slowdecSkip,states=["-"],size=20,pos=(0.3,0.1)))
-        super().addActor(Button(self.fastdecSkip,states=["--"],size=20,pos=(0.25,0.1)))
-        super().addActor(Button(self.slowinSkip,states=["+"],size=20,pos=(0.45,0.1)))
-        super().addActor(Button(self.fastinSkip,states=["++"],size=20,pos=(0.5,0.1)))
+        super().addActor(CustomButton(self.slowdecSkip,states=["-"],size=20,pos=(0.5,0.1)))
+        super().addActor(CustomButton(self.fastdecSkip,states=["--"],size=20,pos=(0.55,0.1)))
+        super().addActor(CustomButton(self.slowinSkip,states=["+"],size=20,pos=(0.65,0.1)))
+        super().addActor(CustomButton(self.fastinSkip,states=["++"],size=20,pos=(0.7,0.1)))
         super().addActor(CustomSlider(self.speedslider, xmin=0, xmax=2999, value=2000, pos=[(0.8,0.05),(0.98, 0.05)], title="", show_value=True, c=(1,1,1)))
         print(self.actors)
-        #self.timeslider = Slider2D(self.timerslider, xmin=0, xmax=5000, value=0, pos=[(0.8,0.15),(0.98, 0.15)], show_value=True, c=(1,1,1))                                                           #xmax=self.spikes.times[-1]
-        #super().addActor(self.timeslider)
+        self.timeslider = CustomSlider(self.timerslider, xmin=0, xmax=5000, value=0, pos=[(0.8,0.15),(0.98, 0.15)], show_value=True, c=(1,1,1))                                                           #xmax=self.spikes.times[-1]
+        super().addActor(self.timeslider)
 
     def hsv2rgb(h,s,v):
         return tuple(round(i * 255) for i in colorsys.hsv_to_rgb(h,s,v))
 
     
     def timerslider(self, widget, event):
+        oldtime = self.timer
         self.timer = widget.value
+        if(self.timer > oldtime):
+            #search from old i up
+            pass
+        else:
+            #search from old i down
+            pass
     def slowdecSkip(self,obj,btn):
         self.skipCounter-=1
     def fastdecSkip(self,obj,btn):
