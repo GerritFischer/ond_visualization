@@ -30,15 +30,20 @@ class Playback(ActorTemplate):
     stimText =None
     skipCounterText=None
     timer=0
+    spikeIndex = 0
     newTimes=0
     speed_minus = 2000
     
 
-    def __init__(self, button_play_pause, speedslider):
+    def __init__(self, button_play_pause, speedslider, timerslider):
         self.button_play_pause = button_play_pause
         self.speedslider = speedslider
+        self.timerslider = timerslider
+
         super().__init__()
-        self.button = CustomButton(self.button_play_pause, states=[" ▶ "," ⏸ "], size=50, c=("white","white"), bc=("grey1","grey1"),pos=(0.2,0.1), font="Kanopus")
+        self.timeslider = CustomSlider(self.timerslider, xmin=0, xmax=4000, value=2000, pos=[(0.25,0.08),(0.5, 0.08)], show_value=True, c=(1,1,1))                                                           #xmax=self.spikes.times[-1]
+        super().addActor(self.timeslider)
+        self.button = CustomButton(self.button_play_pause, states=[" ▶ "," ⏸ "], size=50, c=("white","white"), bc=("grey1","grey1"),pos=(0.2,0.11), font="Kanopus")
         print(type(self.button))
         super().addActor(self.button)
 
@@ -50,22 +55,14 @@ class Playback(ActorTemplate):
         super().addActor(CustomButton(self.fastinSkip,states=["++"],size=20,pos=(0.7,0.1)))
         super().addActor(CustomSlider(self.speedslider, xmin=0, xmax=2999, value=2000, pos=[(0.8,0.05),(0.98, 0.05)], title="", show_value=True, c=(1,1,1)))
         print(self.actors)
-        self.timeslider = CustomSlider(self.timerslider, xmin=0, xmax=5000, value=0, pos=[(0.8,0.15),(0.98, 0.15)], show_value=True, c=(1,1,1))                                                           #xmax=self.spikes.times[-1]
-        super().addActor(self.timeslider)
+
 
     def hsv2rgb(h,s,v):
         return tuple(round(i * 255) for i in colorsys.hsv_to_rgb(h,s,v))
 
     
-    def timerslider(self, widget, event):
-        oldtime = self.timer
-        self.timer = widget.value
-        if(self.timer > oldtime):
-            #search from old i up
-            pass
-        else:
-            #search from old i down
-            pass
+
+
     def slowdecSkip(self,obj,btn):
         self.skipCounter-=1
     def fastdecSkip(self,obj,btn):
@@ -75,6 +72,7 @@ class Playback(ActorTemplate):
     def slowinSkip(self,obj,btn):
         self.skipCounter+=1
 
+ 
 
     def skip(self,obj,btn):
         if self.skipCounter==0:

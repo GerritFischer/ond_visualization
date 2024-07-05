@@ -8,13 +8,12 @@ import colorsys
 class Renderer:
 
     timer_id = -1
-    i = 0
     def __init__(self):
         self.plotter = Plotter()
         self.brain = BrainNew()
         self.timeline = Timeline(0, 0.3)
         self.background = Background()
-        self.playback = Playback(self.button_play_pause, self.speedslider)
+        self.playback = Playback(self.button_play_pause, self.speedslider, self.timerslider)
         self.info = Info()
         self.info.setSessionInfo()
         self.background.addToPlotter(self.plotter)
@@ -26,7 +25,14 @@ class Renderer:
 
         self.plotter.roll(180)
         self.plotter.background((30,30,30))
+        
         self.end = self.brain.spikes.times[-1] #temp
+        #wip
+        rep = self.playback.actors[0].GetSliderRepresentation()
+        print(rep.GetMaximumValue())
+        rep.SetMaximumValue(math.floor(self.end))
+        
+        self.playback.actors[0].SetRepresentation(rep)
 
         self.plotter.add_callback("timer", self.animation_tick, enable_picking=False)
     def startRender(self):
@@ -40,21 +46,23 @@ class Renderer:
     def animation_tick(self, event):
         if self.playback.isSkipped():
             self.playback.setSkipped()
-            self.i=self.playback.getSpikeIndex()
+            self.playback.spikeIndex =self.playback.getSpikeIndex()
         if(self.playback.timer < self.end):
-            #self.actors.timeslider.value = self.timer  
+            
+            self.playback.actors[0].GetSliderRepresentation().SetValue(self.playback.timer)
             print(self.playback.speed_minus)
             self.timeline.updateHistogram(self.playback.timer, self.playback.prevAction, self.plotter)
             currentSpikes = []
             elemStillIn = True         
             while(elemStillIn):
-                if(self.i >= len(self.brain.spikes.times)):
+                if(self.playback.spikeIndex >= len(self.brain.spikes.times)):
                     break
-                if(self.brain.spikes.times[self.i] > self.playback.timer and self.brain.spikes.times[self.i] < self.playback.timer + 0.1):
-                    currentSpikes.append(self.i)   
+                if(self.brain.spikes.times[self.playback.spikeIndex] > self.playback.timer and self.brain.spikes.times[self.playback.spikeIndex] < self.playback.timer + 0.1):
+                    currentSpikes.append(self.playback.spikeIndex)  
+                    print("addedSpike") 
                 else:
                     elemStillIn = False
-                self.i += 1
+                self.playback.spikeIndex += 1
              
 
             
@@ -83,6 +91,7 @@ class Renderer:
             self.info.actors[18-len(self.brain.regionModels)].text("Time: " + str(self.playback.timer))
             self.info.actors[18-len(self.brain.regionModels)].properties.SetColor(1,1,1)
             self.playback.timer = math.floor((self.playback.timer*10)+1)/10
+        print(self.playback.spikeIndex)
         self.plotter.render()
 
     def button_play_pause(self, btn, obj):
@@ -92,6 +101,7 @@ class Renderer:
         btn.switch()
     def speedslider(self, widget, event):
         self.playback.speed_minus = widget.value
+        self.updateSpikeIndex()
         
         #TODO: needs fixing
         try:
@@ -100,7 +110,20 @@ class Renderer:
             self.timer_id = self.plotter.timer_callback("create", dt=math.ceil(3000-self.playback.speed_minus))
         except:
             pass
+    
+    def timerslider(self, widget, event):
+        self.playback.timer = math.floor(widget.value*100) / 100
+        self.updateSpikeIndex()
+        
 
         #if "⏸" in self.playback.button.status():
+    def updateSpikeIndex(self):
+        newTimes=0
+        while(self.brain.spikes.times[newTimes]<=self.playback.timer):#need to add spikes times
+            newTimes+=1
+            if(newTimes>=len(self.brain.spikes.times)):
+                break
+            # need to add spike index
+        self.playback.spikeIndex = newTimes
 
     
