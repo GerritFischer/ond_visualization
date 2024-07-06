@@ -54,8 +54,9 @@ class Timeline(ActorTemplate):
     def updateHistogram(self, plotter):
         fig= plt.figure()
         ax = fig.add_subplot(111)
-        fig.set_facecolor("black")
+        fig.set_facecolor("white")
         ax.set_facecolor("black")
+        ax.axis("off")
 
         N, bins, patches = plt.hist(self.dataset, bins=100, range=(1,100))
         for i, patch in enumerate(patches):
@@ -65,12 +66,10 @@ class Timeline(ActorTemplate):
                 patch.set_facecolor((0, 1, 0))
             elif(self.data_names[i] == "Feedback Time, Error"):
                 patch.set_facecolor((1, 0, 0))
-            elif(self.data_names[i] == "Feedback Time"): #for debug, delete later
-                patch.set_facecolor((1, 0, 0))
             else:
                 patch.set_facecolor((0,0,0))
  
-        patches[50].set_edgecolor((1,1,1))
+        patches[50].set_edgecolor((0.2,0.2,0.2))
         fig.tight_layout(pad=1)
         fig.canvas.draw()
 

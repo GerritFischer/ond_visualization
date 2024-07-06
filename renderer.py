@@ -66,6 +66,7 @@ class Renderer:
             #self.playback.actors[0].GetSliderRepresentation().SetValue(self.playback.timer)
             print(self.playback.speed_minus)
             print(self.updateTimelineData())
+            self.updateTrialInfo()
             self.timeline.updateWholeDataSet(self.updateTimelineData())
             self.timeline.updateHistogram(self.plotter)
             currentSpikes = []
@@ -88,7 +89,7 @@ class Renderer:
                     if(self.brain.clusters.acronym[self.brain.spikes.clusters[j]] == self.brain.regionModels[k][0]):
                         spikesInRegion += 1
 
-                self.brain.actors[k+1].actor.GetProperty().SetOpacity(spikesInRegion * 0.01)
+                self.brain.actors[k+1].actor.GetProperty().SetOpacity(spikesInRegion * 0.01 * self.playback.contrast)
                 
 
                 color = self.hsv2rgb(k / len(self.brain.regionModels), 1,1)
@@ -147,25 +148,25 @@ class Renderer:
 
     def updateTimelineData(self):
             timeline=[]
-            timer=self.playback.timer-0.5
+            timer=self.playback.timer-5
             timelineGoCue=self.prevGoCueIn
             timelineFeed=self.prevFeedIn
             append=False
-            for time in range(100):
-                if math.floor((timer+0.01)*100)/100>= self.brain.feedbackTime[timelineFeed]and time<=self.brain.feedbackTime[timelineFeed]:
+            for i in range(100):
+                if math.floor((timer+0.1)*10)/10>= self.brain.feedbackTime[timelineFeed]and timer<=self.brain.feedbackTime[timelineFeed]:
                     if self.brain.feedbackType[timelineFeed]>0:
                         timeline.append("Feedback Time, Reward")
                     else:
                         timeline.append("Feedback Time, Error")
                     append=True
                     timelineFeed+=1
-                if math.floor((time+0.01)*100)/100>=self.brain.goCue[timelineGoCue] and time<=self.brain.goCue[timelineGoCue]:
+                if math.floor((timer+0.1)*10)/10>=self.brain.goCue[timelineGoCue] and timer<=self.brain.goCue[timelineGoCue]:
                     timeline.append("Go Cue")
                     append=True
                 if not append:
                     timeline.append("")
                 append=False
-                time=math.floor((time+0.01)*100)/100
+                timer=math.floor((timer+0.1)*10)/10
             return timeline
     
     def updateTrialInfo(self):
@@ -176,11 +177,11 @@ class Renderer:
         if self.brain.start[self.trialCounter]<=self.playback.timer+0.1:
             self.trialCounter+=1
             self.stimCounter+=1
-        if self.brain.goCue[self.prevGoCueIn]<=self.playback.timer-0.4:
+        if self.brain.goCue[self.prevGoCueIn]<=self.playback.timer-4.9:
             self.prevGoCueIn+=1
-        if self.brain.feedbackTime[self.prevFeedIn]<=self.playback.timer-0.4:
+        if self.brain.feedbackTime[self.prevFeedIn]<=self.playback.timer-4.9:
             self.prevFeedIn+=1
-        if self.brain.start[self.prevTrialIn]<=self.playback.timer-0.4:
+        if self.brain.start[self.prevTrialIn]<=self.playback.timer-4.9:
             self.prevTrialIn+=1
 
     

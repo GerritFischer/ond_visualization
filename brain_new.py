@@ -36,6 +36,7 @@ class BrainNew(ActorTemplate):
 
         #self.plotter.roll(180)
         #self.plotter.background((30,30,30))
+        self.start = self.trialStart()
         self.scene.get_actors()[0].actor.GetProperty().SetColor(1,1,1)
         self.regionModels=self.getRegionModel(self.clusters,self.scene)
         super().setActors(self.scene.get_actors())    
@@ -82,4 +83,12 @@ class BrainNew(ActorTemplate):
                 
             counter+=1
         return stim
-    
+    def trialStart(self):
+        counter=0
+        start=[]
+        for time in self.feedbackTime:
+            if self.feedbackType[counter]>0:
+                start.append(time+1)
+            else:
+                start.append(time+2)
+        return start
