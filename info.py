@@ -28,10 +28,8 @@ class Info(ActorTemplate):
             super().addActor(text_t)
     def setSessionInfo(self, sessionInfo=["unknown-EID", "unknown-PID", "unknow-animal", "unknown-lab"]):
         self.sessionInfo = sessionInfo
-        print(self.sessionInfo[1])
         self.createSessionInfo()
     def createSessionInfo(self):
-        print("run")
         self.headingSessionID = Text2D("Session-ID:", pos=(0.005, 0.96), c=(1,1,1))
         self.sessionID = Text2D(self.sessionInfo[0], pos=(0.005, 0.93), c=(1,1,1))
         self.headingProbeID = Text2D("Probe-ID:", pos=(0.005, 0.90), c=(1,1,1))

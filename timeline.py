@@ -51,13 +51,12 @@ class Timeline(ActorTemplate):
         self.hist = actor2d      
         self.hist.SetVisibility(0)
         super().addActor(self.hist)
-    def updateHistogram(self, timer, prevAction, plotter):
+    def updateHistogram(self, plotter):
         fig= plt.figure()
         ax = fig.add_subplot(111)
         fig.set_facecolor("black")
         ax.set_facecolor("black")
 
-        self.data_names[0] = prevAction  
         N, bins, patches = plt.hist(self.dataset, bins=100, range=(1,100))
         for i, patch in enumerate(patches):
             if(self.data_names[i] == "Go Cue"):
@@ -70,9 +69,7 @@ class Timeline(ActorTemplate):
                 patch.set_facecolor((1, 0, 0))
             else:
                 patch.set_facecolor((0,0,0))
-        for i in range(0,99):
-            self.data_names[98-i+1] = self.data_names[98-i] 
-        
+ 
         patches[50].set_edgecolor((1,1,1))
         fig.tight_layout(pad=1)
         fig.canvas.draw()

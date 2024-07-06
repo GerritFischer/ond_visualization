@@ -5,21 +5,34 @@ from playback import Playback
 from info import Info
 from vedo import Plotter
 import colorsys
+import vtk
 class Renderer:
 
     timer_id = -1
+    goCueIndex=0
+    trialCounter=0
+    feedbackIndex=0
+    stimAppear=""
+    stimCounter=0
+    prevFeedIn=0
+    prevGoCueIn=0
+    prevTrialIn=0
+
     def __init__(self):
         self.plotter = Plotter()
         self.brain = BrainNew()
         self.timeline = Timeline(0, 0.3)
         self.background = Background()
-        self.playback = Playback(self.button_play_pause, self.speedslider, self.timerslider)
+        self.playback = Playback(self.button_play_pause, self.speedslider, self.timerslider, self.skip)
         self.end = self.brain.spikes.times[-1] #temp
         rep = self.playback.actors[0].GetSliderRepresentation()
-        print(rep.GetMaximumValue())
-        rep.SetMaximumValue(math.floor(self.end))
-        
+        rep.SetMaximumValue(math.floor(self.end)) 
         self.playback.actors[0].SetRepresentation(rep)
+        rep2 = self.playback.actors[1].GetSliderRepresentation()
+        rep2.SetMaximumValue(len(self.brain.goCue))
+        self.playback.actors[1].SetRepresentation(rep2)
+
+
 
         self.info = Info()
         self.info.setSessionInfo()
@@ -27,7 +40,7 @@ class Renderer:
         self.info.addToPlotter(self.plotter)  
         self.timeline.addToPlotter(self.plotter)
         self.brain.addToPlotter(self.plotter)
-        self.playback.addToPlotter(self.plotter)
+        
         
 
         self.plotter.roll(180)
@@ -38,6 +51,7 @@ class Renderer:
 
 
         self.plotter.add_callback("timer", self.animation_tick, enable_picking=False)
+        self.playback.addToPlotter(self.plotter)
     def startRender(self):
         print(self.plotter.get_actors())
         self.plotter.show(__doc__)
@@ -47,22 +61,20 @@ class Renderer:
 
     
     def animation_tick(self, event):
-        if self.playback.isSkipped():
-            self.playback.setSkipped()
-            self.playback.spikeIndex =self.playback.getSpikeIndex()
         if(self.playback.timer < self.end):
             
-            self.playback.actors[0].GetSliderRepresentation().SetValue(self.playback.timer)
+            #self.playback.actors[0].GetSliderRepresentation().SetValue(self.playback.timer)
             print(self.playback.speed_minus)
-            self.timeline.updateHistogram(self.playback.timer, self.playback.prevAction, self.plotter)
+            print(self.updateTimelineData())
+            self.timeline.updateWholeDataSet(self.updateTimelineData())
+            self.timeline.updateHistogram(self.plotter)
             currentSpikes = []
             elemStillIn = True         
             while(elemStillIn):
                 if(self.playback.spikeIndex >= len(self.brain.spikes.times)):
                     break
                 if(self.brain.spikes.times[self.playback.spikeIndex] > self.playback.timer and self.brain.spikes.times[self.playback.spikeIndex] < self.playback.timer + 0.1):
-                    currentSpikes.append(self.playback.spikeIndex)  
-                    print("addedSpike") 
+                    currentSpikes.append(self.playback.spikeIndex)   
                 else:
                     elemStillIn = False
                 self.playback.spikeIndex += 1
@@ -133,4 +145,91 @@ class Renderer:
             # need to add spike index
         self.playback.spikeIndex = newTimes
 
+    def updateTimelineData(self):
+            timeline=[]
+            timer=self.playback.timer-0.5
+            timelineGoCue=self.prevGoCueIn
+            timelineFeed=self.prevFeedIn
+            append=False
+            for time in range(100):
+                if math.floor((timer+0.01)*100)/100>= self.brain.feedbackTime[timelineFeed]and time<=self.brain.feedbackTime[timelineFeed]:
+                    if self.brain.feedbackType[timelineFeed]>0:
+                        timeline.append("Feedback Time, Reward")
+                    else:
+                        timeline.append("Feedback Time, Error")
+                    append=True
+                    timelineFeed+=1
+                if math.floor((time+0.01)*100)/100>=self.brain.goCue[timelineGoCue] and time<=self.brain.goCue[timelineGoCue]:
+                    timeline.append("Go Cue")
+                    append=True
+                if not append:
+                    timeline.append("")
+                append=False
+                time=math.floor((time+0.01)*100)/100
+            return timeline
     
+    def updateTrialInfo(self):
+        if self.brain.goCue[self.goCueIndex]<=self.playback.timer+0.1:
+            self.goCueIndex+=1
+        if self.brain.feedbackTime[self.feedbackIndex]<=self.playback.timer+0.1:
+            self.feedbackIndex+=1
+        if self.brain.start[self.trialCounter]<=self.playback.timer+0.1:
+            self.trialCounter+=1
+            self.stimCounter+=1
+        if self.brain.goCue[self.prevGoCueIn]<=self.playback.timer-0.4:
+            self.prevGoCueIn+=1
+        if self.brain.feedbackTime[self.prevFeedIn]<=self.playback.timer-0.4:
+            self.prevFeedIn+=1
+        if self.brain.start[self.prevTrialIn]<=self.playback.timer-0.4:
+            self.prevTrialIn+=1
+
+    
+    def getSkippedTimer(self,skip):
+        if skip<=0:
+            return 0
+        if skip>=len(self.brain.goCue):
+            timer= self.brain.feedbackTime[len(self.brain.feedbackTime)-2]# one time -1 to get be inside the list boundary and the other -1 to get the time of prev feedbackTime
+            if self.brain.feedbackType[len(self.brain.feedbackType)-2]>0:
+                timer+=1 #new trial time after reward
+                timer= math.floor(timer*10)/10
+            else:
+                timer= math.floor((timer/10)+1)*10
+                timer+=2 # new trial time after Fail
+            return timer
+        timer=self.brain.feedbackTime[skip-1]
+        if self.brain.feedbackType[skip-1]>0:
+            timer+=1
+            timer= math.floor(timer*10)/10
+        else:
+            timer+=2
+            timer= math.floor(timer*10)/10
+        return timer
+    
+    def skip(self, widget, event):
+        trialNum = math.floor(widget.value)
+        if trialNum==0:
+            self.playback.timer=0
+            self.goCueIndex=0
+            self.feedbackIndex=0
+            self.trialCounter=0
+            self.prevFeedIn=0
+            self.prevGoCueIn=0
+        else:
+            self.goCueIndex=trialNum-1
+            self.feedbackIndex=self.goCueIndex
+            self.trialCounter=trialNum
+            self.prevFeedIn=self.goCueIndex
+            self.prevGoCueIn=self.goCueIndex
+            self.playback.timer=self.getSkippedTimer(trialNum)
+        
+        if self.trialCounter==0:
+            newStimCounter= 0
+        else:
+            newStimCounter=self.trialCounter-1
+        if newStimCounter%2==0:
+            self.stimAppear="Stim Off"
+        else:
+            self.stimAppear="Stim On"
+        self.stimCounter=newStimCounter
+
+        self.updateSpikeIndex()

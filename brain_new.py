@@ -6,7 +6,16 @@ from brainbox.plot import peri_event_time_histogram
 from brainbox.singlecell import calculate_peths
 from one.api import ONE
 from ibllib.atlas import AllenAtlas
+import math
 class BrainNew(ActorTemplate):
+    goCueIndex=0
+    trialCounter=0
+    feedbackIndex=0
+    stimAppear=""
+    stimCounter=0
+    prevFeedIn=0
+    prevGoCueIn=0
+    prevTrialIn=0
     def __init__(self):
         print("here")
         super().__init__()
@@ -73,3 +82,4 @@ class BrainNew(ActorTemplate):
                 
             counter+=1
         return stim
+    

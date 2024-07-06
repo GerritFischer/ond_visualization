@@ -16,7 +16,7 @@ class ActorTemplate:
                 #test = Slider2D()
                 print("added")
                 #print(actor.GetCommand(1))
-                plotter.add_slider(actor.sliderfunc, xmin=actor.GetRepresentation().GetMinimumValue(),  xmax=actor.GetRepresentation().GetMaximumValue(), value=2000, pos=actor.pos, title="", show_value=True, c=(1,1,1))
+                plotter.add_slider(actor.sliderfunc, xmin=actor.GetRepresentation().GetMinimumValue(),  xmax=actor.GetRepresentation().GetMaximumValue(), value=actor.value, pos=actor.pos, title=actor.title, show_value=actor.show_value, c=(1,1,1))
                 #super().addActor(Slider2D(self.speedslider, xmin=0, xmax=2999, value=2000, pos=[(0.8,0.05),(0.98, 0.05)], title="", show_value=True, c=(1,1,1)))
             else:
                 plotter.add(actor)
