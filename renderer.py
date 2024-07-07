@@ -17,6 +17,8 @@ class Renderer:
     prevFeedIn=0
     prevGoCueIn=0
     prevTrialIn=0
+    stillAppend=False
+    prevWheelMoveCounter=0
 
     def __init__(self):
         self.plotter = Plotter()
@@ -150,22 +152,36 @@ class Renderer:
             timer=self.playback.timer-5
             timelineGoCue=self.prevGoCueIn
             timelineFeed=self.prevFeedIn
+            timelineTrial= self.prevTrialIn
+            timelineWheel=self.prevWheelMoveCounter
             append=False
-            for i in range(100):
-                if math.floor((timer+0.1)*10)/10>= self.brain.feedbackTime[timelineFeed]and timer<=self.brain.feedbackTime[timelineFeed]:
-                    if self.brain.feedbackType[timelineFeed]>0:
-                        timeline.append("Feedback Time, Reward")
-                    else:
-                        timeline.append("Feedback Time, Error")
-                    append=True
-                    timelineFeed+=1
-                if math.floor((timer+0.1)*10)/10>=self.brain.goCue[timelineGoCue] and timer<=self.brain.goCue[timelineGoCue]:
-                    timeline.append("Go Cue")
-                    append=True
-                if not append:
-                    timeline.append("")
-                append=False
-                timer=math.floor((timer+0.1)*10)/10
+            for time_e in range(100):
+                if self.stillAppend:
+                    timeline.append(self.rewardType)
+                    if self.brain.start[timelineTrial]>=timer:
+                        self.stillAppend=False
+                        timelineTrial+=1
+                else:
+                    if math.floor((timer+0.1)*100)/100>= self.brain.feedbackTime[timelineFeed]and timer<=self.brain.feedbackTime[timelineFeed]:
+                        if self.brain.feedbackType[timelineFeed]>0:
+                            timeline.append("Feedback Time, Reward")
+                            self.rewardType="Feedback Time, Reward"
+                        else:
+                            timeline.append("Feedback Time, Error")
+                            self.rewardType="Feedback Time, Error"
+                        self.stillAppend=True
+                        append=True
+                        timelineFeed+=1
+                    if math.floor((timer+0.1)*100)/100>=self.brain.goCue[timelineGoCue] and timer<=self.brain.goCue[timelineGoCue]:
+                        timeline.append("Go Cue")
+                        append=True
+                    if math.floor((timer+0.1)*100)/100>=self.brain.firstWheelMove[timelineWheel] and timer <=self.brain.firstWheelMove[timelineWheel]:
+                        timeline.append("First Wheel Movement")
+                        append=True
+                    if not append:
+                        timeline.append("")
+                    append=False
+                timer=math.floor((timer+0.1)*100)/100
             return timeline
     
     def updateTrialInfo(self):

@@ -16,6 +16,8 @@ class BrainNew(ActorTemplate):
     prevFeedIn=0
     prevGoCueIn=0
     prevTrialIn=0
+    firstWheelMove=0
+
     def __init__(self):
         print("here")
         super().__init__()
@@ -29,7 +31,7 @@ class BrainNew(ActorTemplate):
 
         self.spikes, self.clusters, self.channels = self.loadData()
         self.end = self.spikes.times[-1]
-        self.goCue, self.feedbackTime, self.feedbackType,self.stim= self.loadTrials()
+        self.goCue, self.feedbackTime, self.feedbackType,self.stim, self.firstWheelMove = self.loadTrials()
 
         self.scene = Scene(atlas_name="allen_mouse_25um", title="")
         #self.plotter.add_callback("timer", self.animation_tick, enable_picking=False)
@@ -57,14 +59,15 @@ class BrainNew(ActorTemplate):
             regionModels.append([acro, scene.add_brain_region(acro, alpha=0.5)])
         return regionModels
     def loadTrials(self):
-        trials = self.one.load_object(self.EID, 'trials')
-        goCue= trials['goCueTrigger_times']
-        feedbackTime=trials['feedback_times']
-        feedbackType=trials['rewardVolume'] #Volume =0 error  >0 reward
-        stimOff=trials['stimOff_times']
-        stimOn=trials['stimOn_times']
-        stim=self.concat(stimOn,stimOff)
-        return goCue, feedbackTime, feedbackType, stim
+            trials = self.one.load_object(self.EID, 'trials')
+            goCue= trials['goCueTrigger_times']
+            feedbackTime=trials['feedback_times']
+            feedbackType=trials['rewardVolume'] #Volume =0 error  >0 reward
+            stimOff=trials['stimOff_times']
+            stimOn=trials['stimOn_times']
+            firstWheelMove=trials['firstMovement_times']
+            stim=self.concat(stimOn,stimOff)
+            return goCue, feedbackTime, feedbackType, stim, firstWheelMove
     def concat(self,on,off):
         onIndex=0
         offIndex=0
