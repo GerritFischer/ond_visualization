@@ -13,13 +13,13 @@ class Background(ActorTemplate):
         test = Sphere()
         test.legend("test")
         #top side bar 
-        lboxSidebarTop = LegendBox([placeholderSphere], width=0.15, height=0.6, c=(0,0,0), pos="top-left", alpha=1, padding=0)
+        lboxSidebarTop = LegendBox([placeholderSphere], width=0.15, height=0.55, c=(0,0,0), pos="top-left", alpha=1, padding=0)
         lboxSidebarTop.SetBackgroundColor(0.14,0.14,0.14)
         lboxSidebarTop.SetEntryColor(0, 0.14,0.14,0.14)
         lboxSidebarTop.BorderOff()
         super().addActor(lboxSidebarTop)
         #bottom side bar
-        lboxSidebarBottom = LegendBox([placeholderSphere], width=0.15, height=0.3, c=(0,0,0), pos="bottom-left", alpha=1, padding=0)
+        lboxSidebarBottom = LegendBox([placeholderSphere], width=0.15, height=0.35, c=(0,0,0), pos="bottom-left", alpha=1, padding=0)
         lboxSidebarBottom.SetBackgroundColor(0.14,0.14,0.14)
         lboxSidebarBottom.SetEntryColor(0,0.14,0.14,0.14)
         lboxSidebarBottom.BorderOff()
@@ -35,6 +35,6 @@ class Background(ActorTemplate):
         super().addActor(lboxSidebarHeading)
         lboxBottombarHeading = Text2D(" Playback ", (0.15, 0.15), bg=(0.23,0.23,0.23), c=(1,1,1))
         super().addActor(lboxBottombarHeading)
-        lboxSidebarBHeading = Text2D(" Spikes ", (0, 0.299),bg=(0.23,0.23,0.23), c=(1,1,1))
+        lboxSidebarBHeading = Text2D(" Spikes ", (0, 0.348),bg=(0.23,0.23,0.23), c=(1,1,1))
         super().addActor(lboxSidebarBHeading)
 

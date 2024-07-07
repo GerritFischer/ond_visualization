@@ -7,6 +7,7 @@ class Info(ActorTemplate):
         super().__init__()
         self.createText()
         self.createRightText()
+        self.createCurrentInfo()
 
     def createRightText(self):
         self.currentActionText=Text2D(" ",pos=(0.7,0.97),c=(1,1,1))
@@ -23,12 +24,19 @@ class Info(ActorTemplate):
     def createText(self):
         for l in range(20):
             text_t = Text2D(" ")
-            text_t.pos((0.005,l*0.03-0.315))
+            text_t.pos((0.005,l*0.03-0.26))
             text_t.properties.SetColor(1,1,1)
             super().addActor(text_t)
     def setSessionInfo(self, sessionInfo=["unknown-EID", "unknown-PID", "unknow-animal", "unknown-lab"]):
         self.sessionInfo = sessionInfo
         self.createSessionInfo()
+    def createCurrentInfo(self):
+        self.timerText = Text2D("Timer: 0", pos=(0.005, 0.51), c=(1,1,1))
+        self.trialText = Text2D("Trial: 0", pos=(0.005, 0.48), c=(1,1,1))
+        self.stimText = Text2D("Stim: Off", pos=(0.095, 0.48), c=(1,1,1))
+        super().addActor(self.timerText)
+        super().addActor(self.trialText)
+        super().addActor(self.stimText)
     def createSessionInfo(self):
         self.headingSessionID = Text2D("Session-ID:", pos=(0.005, 0.96), c=(1,1,1))
         self.sessionID = Text2D(self.sessionInfo[0], pos=(0.005, 0.93), c=(1,1,1))

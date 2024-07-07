@@ -12,7 +12,7 @@ class Renderer:
     goCueIndex=0
     trialCounter=0
     feedbackIndex=0
-    stimAppear=""
+    stimAppear="Off"
     stimCounter=0
     prevFeedIn=0
     prevGoCueIn=0
@@ -21,7 +21,7 @@ class Renderer:
     def __init__(self):
         self.plotter = Plotter()
         self.brain = BrainNew()
-        self.timeline = Timeline(0, 0.3)
+        self.timeline = Timeline(0, 0.35)
         self.background = Background()
         self.playback = Playback(self.button_play_pause, self.speedslider, self.timerslider, self.skip)
         self.end = self.brain.spikes.times[-1] #temp
@@ -64,8 +64,6 @@ class Renderer:
         if(self.playback.timer < self.end):
             
             #self.playback.actors[0].GetSliderRepresentation().SetValue(self.playback.timer)
-            print(self.playback.speed_minus)
-            print(self.updateTimelineData())
             self.updateTrialInfo()
             self.timeline.updateWholeDataSet(self.updateTimelineData())
             self.timeline.updateHistogram(self.plotter)
@@ -74,7 +72,7 @@ class Renderer:
             while(elemStillIn):
                 if(self.playback.spikeIndex >= len(self.brain.spikes.times)):
                     break
-                if(self.brain.spikes.times[self.playback.spikeIndex] > self.playback.timer and self.brain.spikes.times[self.playback.spikeIndex] < self.playback.timer + 0.1):
+                if(self.brain.spikes.times[self.playback.spikeIndex] > self.playback.timer and self.brain.spikes.times[self.playback.spikeIndex] < self.playback.timer + self.playback.timestep):
                     currentSpikes.append(self.playback.spikeIndex)   
                 else:
                     elemStillIn = False
@@ -104,9 +102,10 @@ class Renderer:
             #self.actors.updateTrialInfo(self.timer)
 
 
-            self.info.actors[18-len(self.brain.regionModels)].text("Time: " + str(self.playback.timer))
-            self.info.actors[18-len(self.brain.regionModels)].properties.SetColor(1,1,1)
-            self.playback.timer = math.floor((self.playback.timer*10)+1)/10
+            self.info.timerText.text("Time: " + str(round(self.playback.timer,2)))
+            self.info.trialText.text("Trial: " + str(self.goCueIndex))
+            self.info.stimText.text("Stim: " + self.stimAppear)
+            self.playback.timer = self.playback.timer + self.playback.timestep
         print(self.playback.spikeIndex)
         self.plotter.render()
 
@@ -228,9 +227,9 @@ class Renderer:
         else:
             newStimCounter=self.trialCounter-1
         if newStimCounter%2==0:
-            self.stimAppear="Stim Off"
+            self.stimAppear="Off"
         else:
-            self.stimAppear="Stim On"
+            self.stimAppear="On"
         self.stimCounter=newStimCounter
 
         self.updateSpikeIndex()
