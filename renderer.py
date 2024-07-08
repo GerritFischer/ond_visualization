@@ -21,9 +21,10 @@ class Renderer:
     prevWheelMoveCounter=0
     rewardType=""
 
-    def __init__(self):
+    def __init__(self, session):
+        self.session = session
         self.plotter = Plotter()
-        self.brain = BrainNew()
+        self.brain = BrainNew(session.getClusterAndSpikesOfSess())
         self.timeline = Timeline(0, 0.35)
         self.background = Background()
         self.playback = Playback(self.button_play_pause, self.speedslider, self.timerslider, self.skip)
@@ -38,7 +39,7 @@ class Renderer:
 
 
         self.info = Info()
-        self.info.setSessionInfo()
+        self.info.setSessionInfo(session.getMainInfo())
         self.background.addToPlotter(self.plotter)
         self.info.addToPlotter(self.plotter)  
         self.timeline.addToPlotter(self.plotter)
@@ -241,6 +242,8 @@ class Renderer:
             self.trialCounter=0
             self.prevFeedIn=0
             self.prevGoCueIn=0
+            self.prevTrialIn=0
+            self.prevWheelMoveCounter=0
         else:
             self.goCueIndex=trialNum-1
             self.feedbackIndex=self.goCueIndex
@@ -248,6 +251,8 @@ class Renderer:
             self.prevFeedIn=self.goCueIndex
             self.prevGoCueIn=self.goCueIndex
             self.playback.timer=self.getSkippedTimer(trialNum)
+            self.prevWheelMoveCounter=self.goCueIndex
+            self.prevTrialIn=self.goCueIndex
         
         newStimCounter=0
         while(self.stim[newStimCounter]<=self.timer):

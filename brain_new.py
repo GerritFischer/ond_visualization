@@ -18,7 +18,7 @@ class BrainNew(ActorTemplate):
     prevTrialIn=0
     firstWheelMove=0
 
-    def __init__(self):
+    def __init__(self, session):
         print("here")
         super().__init__()
         self.roi="SI"

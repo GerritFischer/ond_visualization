@@ -1,6 +1,8 @@
 from renderer import Renderer
+from functions_cv6 import *
 
-r = Renderer()
+session = createSess(Roi="SI")
+r = Renderer(session)
 r.startRender()
 
 
