@@ -19,6 +19,7 @@ class Renderer:
     prevTrialIn=0
     stillAppend=False
     prevWheelMoveCounter=0
+    rewardType=""
 
     def __init__(self):
         self.plotter = Plotter()
@@ -55,7 +56,6 @@ class Renderer:
         self.plotter.add_callback("timer", self.animation_tick, enable_picking=False)
         self.playback.addToPlotter(self.plotter)
     def startRender(self):
-        print(self.plotter.get_actors())
         self.plotter.show(__doc__)
 
     def hsv2rgb(self, h,s,v):
@@ -108,7 +108,6 @@ class Renderer:
             self.info.trialText.text("Trial: " + str(self.goCueIndex))
             self.info.stimText.text("Stim: " + self.stimAppear)
             self.playback.timer = self.playback.timer + self.playback.timestep
-        print(self.playback.spikeIndex)
         self.plotter.render()
 
     def button_play_pause(self, btn, obj):
@@ -125,13 +124,13 @@ class Renderer:
         
         #TODO: needs fixing
         try:
-            print("ARGHT")
             self.plotter.timer_callback("destroy", self.timer_id)
             self.timer_id = self.plotter.timer_callback("create", dt=math.ceil(3000-self.playback.speed_minus))
         except:
             pass
     
     def timerslider(self, widget, event):
+        self.synchIndex(self.playback.timer,math.floor(widget.value*100) / 100)
         self.playback.timer = math.floor(widget.value*100) / 100
         self.updateSpikeIndex()
 
@@ -148,56 +147,67 @@ class Renderer:
         self.playback.spikeIndex = newTimes
 
     def updateTimelineData(self):
-            timeline=[]
-            timer=self.playback.timer-5
-            timelineGoCue=self.prevGoCueIn
-            timelineFeed=self.prevFeedIn
-            timelineTrial= self.prevTrialIn
-            timelineWheel=self.prevWheelMoveCounter
-            append=False
-            for time_e in range(100):
-                if self.stillAppend:
-                    timeline.append(self.rewardType)
-                    if self.brain.start[timelineTrial]>=timer:
-                        self.stillAppend=False
-                        timelineTrial+=1
+        timeline=[]
+        timer=self.playback.timer-5
+        timelineGoCue=self.prevGoCueIn
+        timelineFeed=self.prevFeedIn
+        timelineTrial= self.prevTrialIn
+        timelineWheel=self.prevWheelMoveCounter
+        append=False
+        for time_e in range(100):
+            if timer>=self.brain.feedbackTime[timelineTrial] and timer<=self.brain.start[timelineTrial]  :
+                timeline.append(self.rewardType)
+                append=True
+            if math.floor((timer+0.1)*100)/100>= self.brain.feedbackTime[timelineFeed]and timer<=self.brain.feedbackTime[timelineFeed]:
+                if self.brain.feedbackType[timelineFeed]>0:
+                    timeline.append("Feedback Time, Reward")
+                    self.rewardType="Feedback Time, Reward"
                 else:
-                    if math.floor((timer+0.1)*100)/100>= self.brain.feedbackTime[timelineFeed]and timer<=self.brain.feedbackTime[timelineFeed]:
-                        if self.brain.feedbackType[timelineFeed]>0:
-                            timeline.append("Feedback Time, Reward")
-                            self.rewardType="Feedback Time, Reward"
-                        else:
-                            timeline.append("Feedback Time, Error")
-                            self.rewardType="Feedback Time, Error"
-                        self.stillAppend=True
-                        append=True
-                        timelineFeed+=1
-                    if math.floor((timer+0.1)*100)/100>=self.brain.goCue[timelineGoCue] and timer<=self.brain.goCue[timelineGoCue]:
-                        timeline.append("Go Cue")
-                        append=True
-                    if math.floor((timer+0.1)*100)/100>=self.brain.firstWheelMove[timelineWheel] and timer <=self.brain.firstWheelMove[timelineWheel]:
-                        timeline.append("First Wheel Movement")
-                        append=True
-                    if not append:
-                        timeline.append("")
-                    append=False
-                timer=math.floor((timer+0.1)*100)/100
-            return timeline
+                    timeline.append("Feedback Time, Error")
+                    self.rewardType="Feedback Time, Error"
+                append=True
+                timelineFeed+=1
+            if math.floor((timer+0.1)*100)/100>=self.brain.goCue[timelineGoCue] and timer<=self.brain.goCue[timelineGoCue]:
+                timeline.append("Go Cue")
+                append=True
+                timelineGoCue+=1
+            if math.floor((timer+0.1)*100)/100>=self.brain.firstWheelMove[timelineWheel] and timer <=self.brain.firstWheelMove[timelineWheel]:
+                timeline.append("First Wheel Movement")
+                append=True
+                timelineWheel+=1
+            if not append:
+                timeline.append("")
+            append=False
+            if math.floor((timer+0.1)*100)/100>=self.brain.start[timelineTrial] and timer<=self.brain.start[timelineTrial]:
+                timelineTrial+=1
+            timer=math.floor((timer+0.1)*100)/100
+        print(timeline)
+        return timeline
+
     
     def updateTrialInfo(self):
-        if self.brain.goCue[self.goCueIndex]<=self.playback.timer+0.1:
+        if self.brain.goCue[self.goCueIndex]<=self.playback.timer:
             self.goCueIndex+=1
-        if self.brain.feedbackTime[self.feedbackIndex]<=self.playback.timer+0.1:
+        if self.brain.feedbackTime[self.feedbackIndex]<=self.playback.timer:
             self.feedbackIndex+=1
-        if self.brain.start[self.trialCounter]<=self.playback.timer+0.1:
+        if self.brain.start[self.trialCounter]<=self.playback.timer:
             self.trialCounter+=1
             self.stimCounter+=1
-        if self.brain.goCue[self.prevGoCueIn]<=self.playback.timer-4.9:
+        if self.brain.goCue[self.prevGoCueIn]<=self.playback.timer-5:
             self.prevGoCueIn+=1
-        if self.brain.feedbackTime[self.prevFeedIn]<=self.playback.timer-4.9:
+        if self.brain.feedbackTime[self.prevFeedIn]<=self.playback.timer-5:
             self.prevFeedIn+=1
-        if self.brain.start[self.prevTrialIn]<=self.playback.timer-4.9:
+        if self.brain.start[self.prevTrialIn]<=self.playback.timer-5:
             self.prevTrialIn+=1
+        if self.brain.stim[self.stimCounter]<=self.playback.timer:
+            self.stimCounter+=1
+        if self.stimCounter%2==0:
+            self.stimAppear="Off"
+        else:
+            self.stimAppear="On"
+        if self.brain.firstWheelMove[self.prevWheelMoveCounter]<=self.playback.timer-5:
+            self.prevWheelMoveCounter+=1
+
 
     
     def getSkippedTimer(self,skip):
@@ -222,6 +232,7 @@ class Renderer:
         return timer
     
     def skip(self, widget, event):
+        self.stillAppend=False
         trialNum = math.floor(widget.value)
         if trialNum==0:
             self.playback.timer=0
@@ -238,10 +249,12 @@ class Renderer:
             self.prevGoCueIn=self.goCueIndex
             self.playback.timer=self.getSkippedTimer(trialNum)
         
-        if self.trialCounter==0:
-            newStimCounter= 0
-        else:
-            newStimCounter=self.trialCounter-1
+        newStimCounter=0
+        while(self.stim[newStimCounter]<=self.timer):
+            newStimCounter+=1
+            if(self.stimCounter>=len(self.stim)):
+                break
+        self.stimCounter=newStimCounter
         if newStimCounter%2==0:
             self.stimAppear="Off"
         else:
@@ -249,3 +262,71 @@ class Renderer:
         self.stimCounter=newStimCounter
 
         self.updateSpikeIndex()
+
+    def synchIndex(self,oldTime,newTime):
+        if newTime<oldTime:
+            goCueIndex=0
+            while(self.brain.goCue[goCueIndex]<=self.playback.timer):
+                goCueIndex+=1
+            self.goCueIndex=goCueIndex
+            feedbackIndex=0
+            while(self.brain.feedbackTime[feedbackIndex]<=self.playback.timer):
+                feedbackIndex+=1
+            self.feedbackIndex=feedbackIndex
+            prevGoCue=0
+            while(self.brain.goCue[prevGoCue]<=self.playback.timer-5):
+                prevGoCue+=1
+            self.prevGoCueIn=prevGoCue
+            wheelMove=0
+            while(self.brain.firstWheelMove[wheelMove]<=self.playback.timer-5):
+                wheelMove+=1
+            self.prevWheelMoveCounter=wheelMove
+            stimCounter=0
+            while(self.brain.stim[stimCounter]<=self.playback.timer):
+                stimCounter+=1
+            self.stimCounter=stimCounter
+            prevFeed=0
+            while(self.brain.feedbackTime[prevFeed]<=self.playback.timer-5):
+                prevFeed+=1
+            self.prevFeedIn=prevFeed
+            trialCounter=0
+            while(self.brain.start[trialCounter]<=self.playback.timer):
+                trialCounter+=1
+            self.trialCounter=trialCounter
+            prevTrial=0
+            while(self.brain.start[prevTrial]<=self.playback.timer):
+                prevTrial+=1
+            self.prevTrialIn=prevTrial
+        else:
+            goCueIndex=self.goCueIndex
+            while(self.brain.goCue[goCueIndex]<=self.playback.timer):
+                goCueIndex+=1
+            self.goCueIndex=goCueIndex
+            feedbackIndex=self.feedbackIndex
+            while(self.brain.feedbackTime[feedbackIndex]<=self.playback.timer):
+                feedbackIndex+=1
+            self.feedbackIndex=feedbackIndex
+            prevGoCue=self.prevGoCueIn
+            while(self.brain.goCue[prevGoCue]<=self.playback.timer-5):
+                prevGoCue+=1
+            self.prevGoCueIn=prevGoCue
+            wheelMove=self.prevWheelMoveCounter
+            while(self.brain.firstWheelMove[wheelMove]<=self.playback.timer-5):
+                wheelMove+=1
+            self.prevWheelMoveCounter=wheelMove
+            stimCounter=self.stimCounter
+            while(self.brain.stim[stimCounter]<=self.playback.timer):
+                stimCounter+=1
+            self.stimCounter=stimCounter
+            prevFeed=self.prevFeedIn
+            while(self.brain.feedbackTime[prevFeed]<=self.playback.timer-5):
+                prevFeed+=1
+            self.prevFeedIn=prevFeed
+            trialCounter=self.trialCounter
+            while(self.brain.start[trialCounter]<=self.playback.timer):
+                trialCounter+=1
+            self.trialCounter=trialCounter
+            prevTrial=self.prevTrialIn
+            while(self.brain.start[prevTrial]<=self.playback.timer-5):
+                prevTrial+=1
+            self.prevTrialIn=prevTrial
