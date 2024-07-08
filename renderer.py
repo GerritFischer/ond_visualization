@@ -33,7 +33,7 @@ class Renderer:
         rep.SetMaximumValue(math.floor(self.end)) 
         self.playback.actors[0].SetRepresentation(rep)
         rep2 = self.playback.actors[1].GetSliderRepresentation()
-        rep2.SetMaximumValue(len(self.brain.goCue))
+        rep2.SetMaximumValue(len(self.brain.goCue)-1)
         self.playback.actors[1].SetRepresentation(rep2)
 
 
