@@ -25,7 +25,6 @@ class Timeline(ActorTemplate):
     def generateHistogram(self):
         fig = plt.figure()
         fig.add_subplot(111)
-
         N, bins, patches = plt.hist(x=[1,40,100],bins=100, range=(1,100))
         fig.tight_layout(pad=1)
         fig.canvas.draw()
@@ -94,5 +93,6 @@ class Timeline(ActorTemplate):
         self.hist.SetPosition(self.x, self.y)
         self.hist.GetProperty().SetDisplayLocationToBackground()
         self.hist.SetVisibility(1)
+        #plt.close() maybe add this later
     def updateWholeDataSet(self, dataset):
         self.data_names = dataset

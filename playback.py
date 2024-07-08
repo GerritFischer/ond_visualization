@@ -67,7 +67,3 @@ class Playback(ActorTemplate):
         else: self.timestep = 0.1
         btn.switch()
         
-
-def dummy_s(btn, event):
-    print("hello")
-    btn.switch()

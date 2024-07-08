@@ -6,7 +6,6 @@ class Background(ActorTemplate):
         super().__init__()
         self.generateBackground()
     def generateBackground(self):
-        print("generated background")
         #generate actor with empty legend as placeholder
         placeholderSphere = Sphere()
         placeholderSphere.legend(" ")

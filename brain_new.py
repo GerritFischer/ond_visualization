@@ -19,7 +19,6 @@ class BrainNew(ActorTemplate):
     firstWheelMove=0
 
     def __init__(self, session):
-        print("here")
         super().__init__()
         self.roi="SI"
         self.one = ONE(base_url='https://openalyx.internationalbrainlab.org', password='international', silent=True)
@@ -41,12 +40,13 @@ class BrainNew(ActorTemplate):
         self.start = self.trialStart()
         self.scene.get_actors()[0].actor.GetProperty().SetColor(1,1,1)
         self.regionModels=self.getRegionModel(self.clusters,self.scene)
-        super().setActors(self.scene.get_actors())    
+        super().setActors(self.scene.get_actors())   
+        for i in range(1, len(self.actors)):
+            self.actors[i].actor.GetProperty().SetRepresentation(1) 
     
     def addToPlotter(self, plotter):
         return super().addToPlotter(plotter)
     def loadData(self):       
-        print(f'Found {len(self.ses)} recordings')
         #isolating first session and probe ID
         PID = self.ses[0]['id']
         sl = SpikeSortingLoader(pid=PID, one=self.one, atlas=self.ba) # create instance of the SpikeSortingLoader

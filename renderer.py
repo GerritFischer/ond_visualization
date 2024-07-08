@@ -65,8 +65,6 @@ class Renderer:
     
     def animation_tick(self, event):
         if(self.playback.timer < self.end):
-            
-            #self.playback.actors[0].GetSliderRepresentation().SetValue(self.playback.timer)
             self.updateTrialInfo()
             self.timeline.updateWholeDataSet(self.updateTimelineData())
             self.timeline.updateHistogram(self.plotter)
@@ -80,14 +78,12 @@ class Renderer:
                 else:
                     elemStillIn = False
                 self.playback.spikeIndex += 1
-             
-
-            
+              
             self.info.actors[19].text("Total Spikes: " + str(len(currentSpikes)))
-            for k in range(len(self.brain.regionModels)):
+            for k,regionModel in enumerate(self.brain.regionModels):
                 spikesInRegion = 0
                 for j in currentSpikes:
-                    if(self.brain.clusters.acronym[self.brain.spikes.clusters[j]] == self.brain.regionModels[k][0]):
+                    if(self.brain.clusters.acronym[self.brain.spikes.clusters[j]] == regionModel[0]):
                         spikesInRegion += 1
 
                 self.brain.actors[k+1].actor.GetProperty().SetOpacity(spikesInRegion * 0.01 * self.playback.contrast)
@@ -97,10 +93,9 @@ class Renderer:
                 color255 = (color[0]/255, color[1]/255, color[2]/255)
             
             
-                self.info.actors[18-k].text("Spikes in " + self.brain.regionModels[k][0] + ": " + str(spikesInRegion))
+                self.info.actors[18-k].text("Spikes in " + regionModel[0] + ": " + str(spikesInRegion))
                 self.info.actors[18-k].properties.SetColor(color255)
                 self.brain.actors[k+1].actor.GetProperty().SetColor(color255)
-                self.brain.actors[k+1].actor.GetProperty().SetRepresentation(1)
 
             #self.actors.updateTrialInfo(self.timer)
 
@@ -182,7 +177,7 @@ class Renderer:
             if math.floor((timer+0.1)*100)/100>=self.brain.start[timelineTrial] and timer<=self.brain.start[timelineTrial]:
                 timelineTrial+=1
             timer=math.floor((timer+0.1)*100)/100
-        print(timeline)
+        #print(timeline)
         return timeline
 
     
