@@ -23,7 +23,9 @@ ba = AllenAtlas()
 
 class Session:
     #takes in session as well as PIDs and EIDs if possible, creates spikes and clusters on its own
-    spikes = None                                   
+    spikes = None
+    clusters= None
+    channels= None
     def __init__(self, session, pid = None, eid=None, PrintOn = False):
         self.sess = session
         self.sessEID = eid
@@ -45,6 +47,8 @@ class Session:
                 print(f"Number of Spikes is {(len(spikes['clusters']))}")
                 print(f"Number of Clusters is {len(clusters['channels'])}")
             self.spikes = spikes
+            self.clusters=clusters
+            self.channels=channels
             return cluster
                
     def getEIDinfo(self):
@@ -56,8 +60,6 @@ class Session:
         #return list with sessionInfo  = [unknown EID, PID, subject, lab]
 
 
-    #trials getten für response times und so co_cue times und so mit contrast left rights
-    #in klasse noch als method umimplementieren (einfach paar wörter wechseln und umverlegen)
     def getLineGraph(self, events1, Roi, figsize1 =(7,7), t_before1 = 0.2, t_after1 = 0.5, bin_size1= 0.025, smoothing1=0.025, as_rate1 = True, include_raster1=False, 
                             n_raster1= None, error_bars1='std', pethline_kwargs1 = {'color': 'blue', 'lw': 2}, errbar_kwargs1 = {'color': 'blue', 'alpha': 0.5}, 
                             eventline_kwargs1={'color': 'black', 'alpha': 0.5}, raster_kwargs1={'color': 'black', 'lw': 0.5}, xlab ="", ylab = "", pidnmb = 1):
@@ -78,7 +80,51 @@ class Session:
             plt.tight_layout() # maybe lieber return 
         else:
             Exception("No spikes and cluster there to create a Graph")
+
+    def getAcronymInfo(self):
+        #funktion umbauen das Dic returned wird mit Roi1 = [....], roi2 = [....] usw
+        finDic = {}
+        copAcro = self.cluster['acronym'].copy()
+        copAcro = set(copAcro)
+        for i in copAcro:
+            tempArr = []
+            for j in range(0,len(self.cluster['acronym'])):
+                if self.cluster['acronym'][j] == i:
+                    tempArr.append(j)
+            finDic[i] =tempArr
         
+        return finDic
+
+
+    
+    def getSpecificTrials(self):
+        return[self.trials['goCueTrigger_times'], self.trials['feedback_times'], self.trials['stimOff_times'],
+                self.trials['stimOn_times'], self.trials['firstMovement_times'], self.trials['rewardVolume']]
+        
+    def getStimOnOff(self):
+        conStims = []
+        for i in range(0,len(self.trials["stimOn_times"])):
+            conStims.append(self.trials['stimOn_times'][i])
+            conStims.append(self.trials['stimOff_times'][i])
+        return conStims
+    
+    def getTrialStart(self):
+        fbTime = self.trials["feedback_times"]
+        fbType = self.trials["feedbackType"]
+        start = []
+        for i in range(0,len(fbTime)):
+            if fbType[i]>0:
+                start.append(fbTime[i]+1)
+            else:
+                start.append(fbTime[i]+2)
+        return start
+
+    def getTommyStuff(self):
+        trials = self.getSpecificTrials()
+        stimOnOff = self.getStimOnOff()
+        trialStart = self.getTrialStart()
+        return [trials[0], trials[1], trials[5], stimOnOff, trials[4], trialStart] 
+    #return [goCueTRigger, feebbackTimes, rewardVolumme, stimOn/Off times, firstMovment, trialstarts]
 
 
 
@@ -135,5 +181,4 @@ def pidsofSessions(roi = ""):
     ses = one.alyx.rest('insertions', 'list', atlas_acronym = roi)
     pids = [i['id'] for i in ses]
     return pids
-
 
