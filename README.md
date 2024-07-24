@@ -1,5 +1,19 @@
 # ond_visualization
 A simple tool to visualize the IBL Dataset using the ONE API
+## How to use
+### 1. Install pip package
+```
+pip install ond-visualization
+```
+### 2. Run example code
+```py
+import ond_visualization as ond
+
+session = ond.createSess(Roi="SI")
+r = ond.Renderer(session)
+r.startRender()
+```
+
 
 ### Citations  
 Brainrender: <br>
