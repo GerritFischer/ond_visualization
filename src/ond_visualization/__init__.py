@@ -155,9 +155,8 @@ ba = AllenAtlas()
 
 class Session:
     #takes in session as well as PIDs and EIDs if possible, creates spikes and clusters on its own
-    spikes = None
-    clusters= None
-    channels= None
+    spikes = None 
+    channels = None                                  
     def __init__(self, session, pid = None, eid=None, PrintOn = False):
         self.sess = session
         self.sessEID = eid
@@ -166,6 +165,7 @@ class Session:
         self.PrintOn = PrintOn
         self.cluster = self.getClusterAndSpikesOfSess()
         self.trials = one.load_object(self.sessEID,"trials")
+
         
     #method of the class that has the function of being activated when a class object is created and updates the attributes in the class object itself with the data of the choosen session    
     def getClusterAndSpikesOfSess(self):
@@ -179,8 +179,7 @@ class Session:
                 print(f"Number of Spikes is {(len(spikes['clusters']))}")
                 print(f"Number of Clusters is {len(clusters['channels'])}")
             self.spikes = spikes
-            self.clusters=clusters
-            self.channels=channels
+            self.channel = channels
             return cluster
                
     def getEIDinfo(self):
@@ -192,7 +191,7 @@ class Session:
         #return list with sessionInfo  = [unknown EID, PID, subject, lab]
 
 
-    def getLineGraph(self, events1, Roi, figsize1 =(7,7), t_before1 = 0.2, t_after1 = 0.5, bin_size1= 0.025, smoothing1=0.025, as_rate1 = True, include_raster1=False, 
+    def getLineGraph(self, events1, Roi, figsize1 =(7,7), intervall1 = [0.2, 0.5], bin_size1= 0.025, smoothing1=0.025, as_rate1 = True, include_raster1=False, 
                             n_raster1= None, error_bars1='std', pethline_kwargs1 = {'color': 'blue', 'lw': 2}, errbar_kwargs1 = {'color': 'blue', 'alpha': 0.5}, 
                             eventline_kwargs1={'color': 'black', 'alpha': 0.5}, raster_kwargs1={'color': 'black', 'lw': 0.5}, xlab ="", ylab = "", pidnmb = 1):
         if(self.cluster != None):
@@ -202,7 +201,7 @@ class Session:
             f, ax1 = plt.subplots(1, 1, figsize= figsize1)
             peri_event_time_histogram(spike_times = self.spikes.times, spike_clusters= self.spikes.clusters, events= trials[events1],
                                     cluster_id= ROI_neurons[pidnmb],  #ehemals ROI Neurons gibt einfach eine einzige Cluster ID an such dir die mal raus 
-                                    t_before = t_before1, t_after=t_after1, bin_size= bin_size1, smoothing= smoothing1, as_rate=as_rate1,
+                                    t_before = intervall1[0], t_after=intervall1[1], bin_size= bin_size1, smoothing= smoothing1, as_rate=as_rate1,
                                     include_raster=include_raster1,n_rasters= n_raster1, error_bars = error_bars1, ax=ax1, #ax2 is a weird thing, understand it 
                                     pethline_kwargs=pethline_kwargs1,
                                     errbar_kwargs=errbar_kwargs1,
@@ -214,7 +213,6 @@ class Session:
             Exception("No spikes and cluster there to create a Graph")
 
     def getAcronymInfo(self):
-        #funktion umbauen das Dic returned wird mit Roi1 = [....], roi2 = [....] usw
         finDic = {}
         copAcro = self.cluster['acronym'].copy()
         copAcro = set(copAcro)
@@ -267,7 +265,7 @@ def createSess(Roi = "", pid = "", POn = False, sessNmb= 0, EID = "",lab ="", nm
         if POn:
                 print(f'Found {len(ses1)} Sessions')   #print if POn = True
         if (sessNmb > len(ses1)):
-            raise Exception("The number of your choosing is bigger than the found sessions") #error check for bad unmatiching parameter
+            raise Exception("The session number of your choosing is bigger than the found sessions") #error check for bad unmatiching parameter
         else:
                 ses11 = ses1[sessNmb]       #continue if sessNmb is fine    
                 EID = ses11["id"]           #this 3 lines take 1 session, takes the EID and tries to find the PID with it
@@ -293,6 +291,12 @@ def createSess(Roi = "", pid = "", POn = False, sessNmb= 0, EID = "",lab ="", nm
             if (starTime != "")and (i["session_info"]["start_time"]!=starTime):continue
             if(taskProt != "")and(i["session_info"]["task_protocol"]==taskProt):continue
             finalPIDs.append(i)
+        if POn:
+            print(f'Found {len(finalPIDs)} Sessions')   #print if POn = True
+        if (sessNmb > len(finalPIDs)):
+            raise Exception("The session number of your choosing is bigger than the found sessions") #error check for bad unmatiching parameter
+        if(len(finalPIDs) == 0):
+            raise Exception("there where no sessions to your likeliness found")
         ses2 = finalPIDs[sessNmb]
         ses2EID = ses2["session_info"]
         EID = ses2EID["id"]
@@ -313,6 +317,29 @@ def pidsofSessions(roi = ""):
     ses = one.alyx.rest('insertions', 'list', atlas_acronym = roi)
     pids = [i['id'] for i in ses]
     return pids
+
+
+#Some test cases can be completly ignored
+
+""" #case 1
+test1 = createSess(pid="5e8ac11b-959a-49ab-a6a3-8a3397e1df0e", POn=True)
+Acros = test1.getAcronymInfo()
+print(Acros)  
+------------------------------
+#case2
+roi = "SNr" # Region Of Interest (acronym according to Allen Atlas)
+test2= createSess(pid = '6a7544a8-d3d4-44a1-a9c6-7f4d460feaac', POn=True)
+print(test2.getMainInfo())
+test2.getLineGraph(events1='stimOn_times', Roi = roi, xlab="Time from Stimulus Onset (s)", ylab="spikes/s", intervall1=[0.5,2], error_bars1="sem",
+                 pidnmb=2)
+plt.show() 
+------------------------------
+#case3 
+roi2 = "CP"
+test3 = createSess(Roi= roi2, POn=True)
+test3.getLineGraph(events1='stimOn_times', Roi = roi2, xlab="Time from Stimulus Onset (s)", ylab="spikes/s", intervall1=[0.5,2], include_raster1=True, error_bars1="sem",
+                 pidnmb=2)
+plt.show()"""
 
 from vedo import Text2D
 
