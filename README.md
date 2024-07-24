@@ -10,8 +10,8 @@ pip install ond-visualization
 import ond_visualization as ond
 
 session = ond.createSess(Roi="SI")
-r = ond.Renderer(session)
-r.startRender()
+renderer = ond.Renderer(session)
+renderer.startRender()
 ```
 
 
