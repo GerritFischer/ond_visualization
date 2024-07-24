@@ -18,5 +18,5 @@ renderer.startRender()
 ## Citations  
 Brainrender: <br>
 Claudi, F., Tyson, A., Petrucco, L., Margrie, T. W., Portugues, R., & Branco, T. (2021). Visualizing anatomically registered data with brainrender. eLife, 10. https://doi.org/10.7554/eLife.65751 <br>
-SimpleSessionEx <br>
+SimpleSessionEx: <br>
 Wojak, M. https://github.com/Blumenfreund1337/SimpleSessionEx
