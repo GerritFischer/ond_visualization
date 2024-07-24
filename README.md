@@ -1,5 +1,11 @@
 # ond_visualization
-A simple tool to visualize the IBL Dataset using the ONE API
+A simple tool to visualize the IBL Dataset using the ONE API <br>
+<br>
+**Contributions**: <br>
+Gerrit Fischer: Brain, Playback, Info, Background, Timeline, ActorTemplate <br>
+Duc Cuong Tommy Tran: Timeline Data, Timeline, Skip Functions, Sync Functions <br>
+Maximilian Wojak: Library for Data Access <br>
+<br>
 ## How to use
 ### 1. Install pip package
 ```
