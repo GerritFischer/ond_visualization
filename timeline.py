@@ -23,20 +23,22 @@ class Timeline(ActorTemplate):
         heading.pos((self.x+0.1, self.y+0.1))
         super().addActor(heading)
     def generateHistogram(self):
+        #generate histogram in matplotlib
         fig = plt.figure()
         fig.add_subplot(111)
         N, bins, patches = plt.hist(x=[1,40,100],bins=100, range=(1,100))
         fig.tight_layout(pad=1)
         fig.canvas.draw()
 
+        #get image data from plot
         data = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
         data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
 
-
+        #turn image data into image from vedo
         pic = Image(data)
         pic.resize([400,300])
 
-
+        #map image to 2d actor
         mapper = vtk.vtkImageMapper()
         mapper.SetInputData(pic.dataset)
         mapper.SetColorWindow(255)
@@ -46,11 +48,11 @@ class Timeline(ActorTemplate):
         actor2d.GetPositionCoordinate().SetCoordinateSystemToNormalizedViewport()
         actor2d.SetPosition(self.x, self.y)
         actor2d.GetProperty().SetDisplayLocationToBackground()
-        #actor2d.SetDisplayPosition(0,400)
         self.hist = actor2d      
         self.hist.SetVisibility(0)
         super().addActor(self.hist)
     def updateHistogram(self, plotter):
+        #same as generate
         fig= plt.figure()
         ax = fig.add_subplot(111)
         fig.set_facecolor("black")
@@ -94,5 +96,6 @@ class Timeline(ActorTemplate):
         self.hist.GetProperty().SetDisplayLocationToBackground()
         self.hist.SetVisibility(1)
         #plt.close() maybe add this later
+
     def updateWholeDataSet(self, dataset):
         self.data_names = dataset

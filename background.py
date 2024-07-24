@@ -9,8 +9,6 @@ class Background(ActorTemplate):
         #generate actor with empty legend as placeholder
         placeholderSphere = Sphere()
         placeholderSphere.legend(" ")
-        test = Sphere()
-        test.legend("test")
         #top side bar 
         lboxSidebarTop = LegendBox([placeholderSphere], width=0.15, height=0.55, c=(0,0,0), pos="top-left", alpha=1, padding=0)
         lboxSidebarTop.SetBackgroundColor(0.14,0.14,0.14)
@@ -23,6 +21,7 @@ class Background(ActorTemplate):
         lboxSidebarBottom.SetEntryColor(0,0.14,0.14,0.14)
         lboxSidebarBottom.BorderOff()
         super().addActor(lboxSidebarBottom)
+        #bottom bar
         lboxBottomBar = LegendBox([placeholderSphere], width=0.85, height=0.15, c=(0,0,0), pos="bottom-left", alpha=1, padding=0)
         lboxBottomBar.SetBackgroundColor(0.14,0.14,0.14)
         lboxBottomBar.SetEntryColor(0, 0.14,0.14,0.14)
@@ -30,6 +29,7 @@ class Background(ActorTemplate):
         lboxBottomBar.GetPositionCoordinate().SetValue(0.15, 0)
         super().addActor(lboxBottomBar)
         
+        #headings
         lboxSidebarHeading = Text2D(" Info ", (0, 1), bg=(0.23,0.23,0.23), c=(1,1,1))
         super().addActor(lboxSidebarHeading)
         lboxBottombarHeading = Text2D(" Playback ", (0.15, 0.15), bg=(0.23,0.23,0.23), c=(1,1,1))
