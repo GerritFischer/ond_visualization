@@ -6,7 +6,7 @@ Gerrit Fischer: Brain, Playback, Info, Background, Timeline, ActorTemplate <br>
 Duc Cuong Tommy Tran: Timeline Data, Timeline, Skip Functions, Sync Functions <br>
 Maximilian Wojak: Library for Data Access <br>
 <br>
-## Important Information
+## Important information
 This software has been developed and tested on Windows systems. <br>
 At the moment only a few tests have been done on Linux and MacOS with mixed results. <br>
 We highly recommend using a Windows system. <br>
@@ -26,7 +26,10 @@ session = ond.createSess(Roi="SI")
 renderer = ond.Renderer(session)
 renderer.startRender()
 ```
-
+## Known errors
+ImportError: DLL load failed while importing _cext:
+This error can be resolved by installing another package
+``` pip install msvc-runtime ```
 
 ## Citations  
 Brainrender: <br>
