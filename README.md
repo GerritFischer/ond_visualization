@@ -10,6 +10,8 @@ Maximilian Wojak: Library for Data Access <br>
 This software has been developed and tested on Windows systems. <br>
 At the moment only a few tests have been done on Linux and MacOS with mixed results. <br>
 We highly recommend using a Windows system. <br>
+Also Python 3.12 is currently not working because of different dependencies. <br>
+We recommend Python 3.11 <br>
 <br>
 ## How to use
 ### 1. Install pip package
