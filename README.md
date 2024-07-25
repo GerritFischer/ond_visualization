@@ -1,10 +1,15 @@
 # ond_visualization
 A simple tool to visualize the IBL Dataset using the ONE API <br>
 <br>
-**Contributions**: <br>
+## Contributions
 Gerrit Fischer: Brain, Playback, Info, Background, Timeline, ActorTemplate <br>
 Duc Cuong Tommy Tran: Timeline Data, Timeline, Skip Functions, Sync Functions <br>
 Maximilian Wojak: Library for Data Access <br>
+<br>
+## Important Information
+This software has been developed and tested on Windows systems. <br>
+At the moment only a few tests have been done on Linux and MacOS with mixed results. <br>
+We highly recommend using a Windows system. <br>
 <br>
 ## How to use
 ### 1. Install pip package
