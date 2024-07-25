@@ -1,4 +1,4 @@
-from vedo import Button#
+from vedo import Button
 class ActorTemplate:
     def __init__(self):
         self.actors = []
