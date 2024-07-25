@@ -26,6 +26,9 @@ session = ond.createSess(Roi="SI")
 renderer = ond.Renderer(session)
 renderer.startRender()
 ```
+### Alternative
+Clone the whole repository and run the main.py file. <br>
+
 ## Known errors
 ImportError: DLL load failed while importing _cext:
 This error can be resolved by installing another package
