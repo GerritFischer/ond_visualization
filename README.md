@@ -28,6 +28,7 @@ renderer.startRender()
 ```
 ### Alternative
 Clone the whole repository and run the main.py file. <br>
+For that ```pip install brainrender``` has to be run first <br>
 
 ## Known errors
 ImportError: DLL load failed while importing _cext:
